@@ -2,10 +2,22 @@ def evaluate(preds, targets):
     """
     Evaluate the model on the test set
     Args:
-        preds: Predictions from the model as dictionary of {file_name: {"emotion"}}
+        preds: Predictions from the model as dictionary of {file_name: {"emotion": emotion}}
         targets: True labels: dictionary of {file_name: {"emotion": emotion, "fold": fold}}
 
     """
+
+    # Remove "other" emotion from the predictions and targets
+    preds = {key: value for key, value in preds.items() if value["emotion"] != "other"}
+    targets = {key: value for key, value in targets.items() if value["emotion"] != "other"}
+
+    classes = ["neutral", "happy", "sad", "angry"]
+    pred_classes = set([pred["emotion"] for pred in preds.values()])
+    target_classes = set([target["emotion"] for target in targets.values()])
+    if pred_classes != classes:
+        raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
+    if target_classes != classes:
+        raise ValueError(f"Targets contain invalid classes: {target_classes}")
 
     if set(preds.keys()) != set(targets.keys()):
         raise ValueError("Predictions and targets have different keys")
