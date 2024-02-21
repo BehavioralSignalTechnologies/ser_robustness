@@ -159,6 +159,7 @@ class ParserForIEMOCAP:
                         utterance)
                     annotated_utterances[utterance] = {
                         "emotion": emotion,
+                        "fold": session,
                         "speaker_id": speaker_id}
 
         return annotated_utterances
@@ -224,3 +225,4 @@ if __name__ == '__main__':
     data_path = args.input
     parser = ParserForIEMOCAP(data_path)
     annotated_utterances = parser.run_parser()
+    import pdb; pdb.set_trace()
