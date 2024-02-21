@@ -8,12 +8,15 @@ def evaluate(preds, targets):
     """
 
     if set(preds.keys()) != set(targets.keys()):
-        raise ValueError("Predictions and targets are not aligned")
+        raise ValueError("Predictions and targets have different keys")
 
-    sessions = set([target["fold"] for target in targets.values()])
-    results = {}
-    for session in sessions:
-        keys = [key for key in targets.keys() if targets[key]["fold"] == session]
+    if len(preds) != len(targets):
+        raise ValueError(f"Predictions and targets have different lengths: {len(preds)} and {len(targets)}"
+
+        sessions = set([target["fold"] for target in targets.values()])
+        results = {}
+        for session in sessions:
+            keys = [key for key in targets.keys() if targets[key]["fold"] == session]
 
         # Convert the dictionaries to lists
         keys = list(preds.keys())
@@ -28,6 +31,6 @@ def evaluate(preds, targets):
 
         results[session] = [weighted_accuracy, unweighted_accuracy]
 
-    results["average"] = [sum([result[0] for result in results.values()]) / len(results),
-                          sum([result[1] for result in results.values()]) / len(results)]
+        results["average"] = [sum([result[0] for result in results.values()]) / len(results),
+                              sum([result[1] for result in results.values()]) / len(results)]
     return results
