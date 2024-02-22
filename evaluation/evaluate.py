@@ -34,18 +34,21 @@ def evaluate_iemocap(preds, targets):
         targets: True labels: dictionary of {file_name: {"emotion": emotion, "fold": fold}}
     """
 
+    # Check that the classes are valid
+    expected_classes = {"neutral", "happy", "sad", "angry"}
+    pred_classes = set([pred["emotion"] for pred in preds.values()])
+    target_classes = set([target["emotion"] for target in targets.values()])
+    if pred_classes - expected_classes != set():
+        raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
+    if pred_classes - expected_classes != set():
+        raise ValueError(f"Targets contain invalid classes: {target_classes}")
+
     # Remove "other" emotion from the predictions and targets
     preds = {key: value for key, value in preds.items() if value["emotion"] != "other"}
     targets = {key: value for key, value in targets.items() if value["emotion"] != "other"}
 
-    # Check that the classes are valid
-    classes = ["neutral", "happy", "sad", "angry"]
-    pred_classes = set([pred["emotion"] for pred in preds.values()])
-    target_classes = set([target["emotion"] for target in targets.values()])
-    if pred_classes != classes:
-        raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
-    if target_classes != classes:
-        raise ValueError(f"Targets contain invalid classes: {target_classes}")
+    # Remove prediction keys that are not in the targets
+    preds = {key: value for key, value in preds.items() if key in targets}
 
     # Check that the filenames are the same
     if set(preds.keys()) != set(targets.keys()):
@@ -58,7 +61,7 @@ def evaluate_iemocap(preds, targets):
     # Evaluate with 5-fold cross-validation
     sessions = set([target["fold"] for target in targets.values()])
     results = {}
-    for session in sessions:
+    for session in sorted(sessions):
         fold_filenames = [key for key, value in targets.items() if value["fold"] == session]
 
         fold_preds = [preds[key]["emotion"] for key in fold_filenames]
@@ -72,8 +75,8 @@ def evaluate_iemocap(preds, targets):
 
         results[session] = [weighted_accuracy, unweighted_accuracy]
 
-        results["average"] = [sum([result[0] for result in results.values()]) / len(results),
-                              sum([result[1] for result in results.values()]) / len(results)]
+    results["average"] = [sum([result[0] for result in results.values()]) / len(results),
+                          sum([result[1] for result in results.values()]) / len(results)]
     return results
 
 
