@@ -1,3 +1,11 @@
+""" 
+    Parser for the IEMOCAP dataset, finding all the audio utterances 
+    and corresponding annotations, based on the dataset structure.
+
+    Example usage: 
+        python iemocap.py -i /path/to/IEMOCAP/
+"""
+
 import os
 import string
 import argparse
@@ -12,19 +20,16 @@ class ParserForIEMOCAP:
 
     def __init__(self, data_path):
         self.data_path = data_path
-        if not self.data_path.endswith('/'):
-            self.data_path += '/'
-        self.wav_files_path = self.data_path + "Session%d/sentences/wav/"
-        self.annotation_path = self.data_path + "Session%d/dialog/" \
-                                                "EmoEvaluation/"
-        self.dialogs_path = self.data_path + "Session%d/dialog/wav/"
+        self.wav_files_path = os.path.join(self.data_path, "Session%d/sentences/wav/")
+        self.annotation_path = os.path.join(self.data_path, "Session%d/dialog/EmoEvaluation/")
+        self.dialogs_path = os.path.join(self.data_path, "Session%d/dialog/wav/")
 
         # list sessions existing in data_path
         self.sessions = [int(folder.replace('Session', '')) for folder in os.listdir(self.data_path)
                          if folder.startswith('Session')]
 
         self.emotion_mapping = {"neu": "neutral", "sad": "sad", "ang":
-            "angry", "hap": "happy", "exc": "happy",
+                                "angry", "hap": "happy", "exc": "happy",
                                 "fru": "frustrated"}
         self.gender_mapping = {"F": "female", "M": "male"}
 
@@ -70,6 +75,7 @@ class ParserForIEMOCAP:
                   'neu', 'valence': 2.500, ...}, ...}, ...})
         """
         dialog_to_annotated_utterances = {}
+
         for dialog in dialog_to_utterances:
             annotation_file = (self.annotation_path % session) + \
                               str(dialog) + ".txt"
@@ -93,7 +99,6 @@ class ParserForIEMOCAP:
                  annotation found. (E.g. {'/path/to/Utterance_1.wav':
                  {'emotion': 'neu', 'valence': 2.500, ...}, ...})
         """
-
         annotation_per_utterance = {}
 
         with open(annotation_file, "r") as annfile:
@@ -122,6 +127,7 @@ class ParserForIEMOCAP:
                     .strip(string.punctuation)
                 annotation["end"] = annfile_list[end_time_idx] \
                     .strip(string.punctuation)
+                
                 annotation_per_utterance[utterance] = annotation
 
         return annotation_per_utterance
@@ -182,6 +188,7 @@ class ParserForIEMOCAP:
                mapping dictionary.
         """
         label_rounded = int(10 * round(float(label), 1))
+
         try:
             label_mapped = [mapping_dict[value_range]
                             for value_range in mapping_dict
@@ -194,12 +201,12 @@ class ParserForIEMOCAP:
         """!
         @brief Find speaker details, i.e speaker ID and gender.
         """
-        utterance_name = os.path.splitext(os.path.basename(
-            utterance_path))[0]
+        utterance_name = os.path.splitext(os.path.basename(utterance_path))[0]
         gender = utterance_name[-4]
         speaker_id = utterance_name[0:5] + gender
         channel = ("speaker1" if (utterance_name[5] == gender) else "speaker2")
         gender = self.gender_mapping[gender]
+
         return speaker_id, gender, channel
 
     def run_parser(self):
