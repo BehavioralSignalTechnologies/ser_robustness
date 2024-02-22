@@ -4,3 +4,4 @@ A robustness evaluation benchmarking procedure for SER
 # Code Structure
 
 - `parsing`: contains the code for parsing the datasets.
+- `evaluation`: contains the code for evaluating the model predictions.

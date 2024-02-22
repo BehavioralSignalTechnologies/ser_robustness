@@ -1,5 +1,4 @@
 import os
-import sys
 import string
 import argparse
 
@@ -225,4 +224,6 @@ if __name__ == '__main__':
     data_path = args.input
     parser = ParserForIEMOCAP(data_path)
     annotated_utterances = parser.run_parser()
-    import pdb; pdb.set_trace()
+    import pdb;
+
+    pdb.set_trace()
