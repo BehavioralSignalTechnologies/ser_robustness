@@ -12,6 +12,8 @@ class ParserForIEMOCAP:
 
     def __init__(self, data_path):
         self.data_path = data_path
+        if not self.data_path.endswith('/'):
+            self.data_path += '/'
         self.wav_files_path = self.data_path + "Session%d/sentences/wav/"
         self.annotation_path = self.data_path + "Session%d/dialog/" \
                                                 "EmoEvaluation/"
@@ -224,6 +226,3 @@ if __name__ == '__main__':
     data_path = args.input
     parser = ParserForIEMOCAP(data_path)
     annotated_utterances = parser.run_parser()
-    import pdb;
-
-    pdb.set_trace()

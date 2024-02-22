@@ -4,7 +4,7 @@ import argparse
 
 from sklearn.metrics import accuracy_score, recall_score
 
-sys.path.append(os.pardir)
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from parsing.iemocap import ParserForIEMOCAP
 
@@ -14,7 +14,7 @@ def parse_csv(preds_csv):
     Parse the predictions CSV file into a dictionary
     Args:
         preds_csv: Path to the predictions CSV file with the following columns:
-                   file_name, emotion
+                   file_name (e.g. Ses05F_impro02_M007.wav), emotion
     Returns:
         Dictionary of {file_name: {"emotion": emotion}}
     """
@@ -79,9 +79,9 @@ def evaluate_iemocap(preds, targets):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate the model on the test set")
-    parser.add_argument("--predictions", type=str, required=True, help="Path to the predictions CSV file")
-    parser.add_argument("--data_path", type=str, required=True, help="Path to the dataset path")
-    parser.add_argument("--dataset", type=str, choices=["iemocap"], required=True, help="Dataset to evaluate")
+    parser.add_argument("-csv", "--predictions", type=str, required=True, help="Path to the predictions CSV file")
+    parser.add_argument("-p", "--data_path", type=str, required=True, help="Path to the dataset path")
+    parser.add_argument("-d", "--dataset", type=str, choices=["iemocap"], required=True, help="Dataset to evaluate")
     args = parser.parse_args()
     return args
 
@@ -93,6 +93,7 @@ if __name__ == "__main__":
     if args.dataset == "iemocap":
         parser = ParserForIEMOCAP(args.data_path)
         targets = parser.run_parser()
+        targets = {os.path.basename(k): v for k, v in targets.items()}
         results = evaluate_iemocap(preds, targets)
         print(f"Weighted accuracy: {results['average'][0]:.2f}")
         print(f"Unweighted accuracy: {results['average'][1]:.2f}")
