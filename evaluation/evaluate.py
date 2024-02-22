@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-
 from sklearn.metrics import accuracy_score, recall_score
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -23,6 +22,7 @@ def parse_csv(preds_csv):
         for line in file:
             file_name, emotion = line.strip().split(",")
             preds[file_name] = {"emotion": emotion}
+
     return preds
 
 
@@ -38,6 +38,7 @@ def evaluate_iemocap(preds, targets):
     expected_classes = {"neutral", "happy", "sad", "angry"}
     pred_classes = set([pred["emotion"] for pred in preds.values()])
     target_classes = set([target["emotion"] for target in targets.values()])
+    
     if pred_classes - expected_classes != set():
         raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
     if pred_classes - expected_classes != set():
