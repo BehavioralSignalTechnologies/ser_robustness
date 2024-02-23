@@ -160,7 +160,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
     """
 
     corruptions_list = parse_config(corruptions_config)
-    for corruption_type, corruption_config in corruptions_list:
+    for corruption_type, corruption_config in tqdm(corruptions_list, desc="Corrupting datasets"):
         corrupted_dataset_path = os.path.join(corrupted_datasets_path,
                                               f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
