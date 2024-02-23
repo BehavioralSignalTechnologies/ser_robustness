@@ -68,7 +68,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
     copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
 
-    print(f"Original dataset copied to {corrupted_dataset_path}")
+    print(f"Saving the corrupted dataset to: {corrupted_dataset_path}")
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
@@ -174,6 +174,8 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
                             corruption_config,
                             force)
+            with open(os.path.join(corrupted_dataset_path, "robuser_config.yaml"), "w") as file_:
+                yaml.dump(corruption_config, file_)
         except Exception as e:
             print(f"Error while corrupting the dataset with '{corruption_type}' corruption: {e}")
             shutil.rmtree(corrupted_dataset_path, ignore_errors=True)
