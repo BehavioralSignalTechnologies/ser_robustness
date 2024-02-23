@@ -1,0 +1,16 @@
+content:
+  enabled: true
+  content_dataset_path:
+    - datasets/ESC-50
+    - datasets/urbansound8k
+    - datasets/musan
+  snr:
+    - 0
+    - 10
+    - 20
+gaussian:
+  enabled: true
+  snr:
+    - 0
+    - 10
+    - 20
