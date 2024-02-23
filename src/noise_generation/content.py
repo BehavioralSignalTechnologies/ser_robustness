@@ -145,13 +145,10 @@ class ContentAugmentation(NoiseGeneration):
             pad_end = ts - tn - pad_front
             noise = np.pad(noise, (pad_front, pad_end), mode='constant')
 
-        # save noise
-        wavfile.write("noise.wav", sample_rate, noise)
-
         s_aug = self.apply_snr(signal, noise)
         s_aug = s_aug / np.abs(s_aug.max())
 
-        return s_aug, sample_rate
+        return s_aug
 
 
 if __name__ == "__main__":
@@ -163,7 +160,6 @@ if __name__ == "__main__":
     augmentation = ContentAugmentation(config)
 
     audio, sample_rate = librosa.load(
-        "/data_drive/iemocap/Session5/sentences/wav/Ses05F_impro01/Ses05F_impro01_F001.wav")
-    augmentation.run(audio, sample_rate)
-    # Save the augmented audio
-    wavfile.write("augmented_audio.wav", sample_rate, audio)
+        "/data_drive/iemocap/Session5/sentences/wav/Ses05F_impro01/Ses05F_impro01_F001.wav", sr=None)
+    s_aug = augmentation.run(audio, sample_rate)
+    wavfile.write("augmented_audio.wav", sample_rate, s_aug)
