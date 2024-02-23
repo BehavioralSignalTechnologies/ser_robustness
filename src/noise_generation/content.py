@@ -16,7 +16,7 @@ from noises import NoiseGeneration
 from utils import normalize_audio
 
 
-class ContentAugmentation(NoiseGeneration):
+class ContentCorruption(NoiseGeneration):
     """
     Class that augments the audio data with content from a sound dataset
     config should contain:
@@ -179,7 +179,7 @@ if __name__ == "__main__":
             "content_dataset_path": "/data_drive/urbansound8k",
             "snr": snr
         }
-        augmentation = ContentAugmentation(config)
+        augmentation = ContentCorruption(config)
 
         for audio_file in audio_files:
             shutil.copy(audio_file, ".")

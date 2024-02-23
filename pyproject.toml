@@ -12,6 +12,7 @@ pyyaml = "^6.0.1"
 audiomentations = "^0.34.1"
 numpy = "1.24.0"
 scipy = "1.9.2"
+tqdm = "^4.66.2"
 
 
 [tool.poetry.group.dev.dependencies]
