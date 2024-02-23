@@ -137,7 +137,7 @@ class ContentAugmentation(NoiseGeneration):
         ts = len(signal)  # Duration of the initial audio signal
         tn = len(noise)  # Duration of the selected noise signal
         if ts <= tn:
-            tn1 = 0
+            tn1 = random.randint(0, tn - ts)
             tn2 = tn1 + ts
             noise = noise[tn1:tn2]
         else:
@@ -152,14 +152,15 @@ class ContentAugmentation(NoiseGeneration):
 
 
 if __name__ == "__main__":
-    config = {
-        "content_dataset_path": "/data_drive/ESC-50-master",
-        "content_dataset_name": "ESC50",
-        "snr": 0
-    }
-    augmentation = ContentAugmentation(config)
+    for snr in [0, 5, 10, 20]:
+        config = {
+            "content_dataset_path": "/data_drive/ESC-50-master",
+            "content_dataset_name": "ESC50",
+            "snr": snr
+        }
+        augmentation = ContentAugmentation(config)
 
-    audio, sample_rate = librosa.load(
-        "/data_drive/iemocap/Session5/sentences/wav/Ses05F_impro01/Ses05F_impro01_F001.wav", sr=None)
-    s_aug = augmentation.run(audio, sample_rate)
-    wavfile.write("augmented_audio.wav", sample_rate, s_aug)
+        audio, sample_rate = librosa.load(
+            "/data_drive/iemocap/Session5/sentences/wav/Ses05F_impro01/Ses05F_impro01_F001.wav", sr=None)
+        s_aug = augmentation.run(audio, sample_rate)
+        wavfile.write(f"augmented_audio_snr_{snr}.wav", sample_rate, s_aug)
