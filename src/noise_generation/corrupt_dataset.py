@@ -142,15 +142,16 @@ def get_corruption_path(corruption_type, corruption_config):
     Returns:
         str: path for the corrupted dataset
     """
-    config = corruption_config.copy()
-    # Remove the enabled key from the configuration
-    config.pop("enabled", None)
-    # Remove full paths from the configuration
-    config = {key: str(value).split("/")[-1] for key, value in config.items()}
+    config_str = ""
+    for key, value in corruption_config.items():
+        if key == "enabled":
+            continue
+        if key == "content_dataset_path":
+            config_str += f"_dataset_{os.path.basename(value)}"
+        else:
+            config_str += f"_{key}_{value}"
 
-    config_str = "_".join(config.values())
-
-    return corruption_type + "_" + config_str
+    return corruption_type + config_str
 
 
 def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False):
