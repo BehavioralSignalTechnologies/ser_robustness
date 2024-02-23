@@ -14,7 +14,7 @@ from parsing.get_parser import get_parser_for_dataset
 from noise_generation.get_corruption import get_corruption
 
 
-def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"]):
+def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=None):
     """
     Copies the original dataset to the corrupted dataset path, ignoring files with the specified extensions.
 
@@ -23,6 +23,9 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
         corrupted_dataset_path (str): path to the corrupted dataset
         ignore_extensions (list): list of file extensions to ignore
     """
+    if ignore_extensions is None:
+        ignore_extensions = [".wav"]
+
     for root, dirs, files in os.walk(original_dataset_path):
         for file in files:
             if not any([file.endswith(extension) for extension in ignore_extensions]):
@@ -52,8 +55,7 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
     parser = parser_class(original_dataset_path)
     annotated_files_dict = parser.run_parser()
 
-    # Copy the original dataset to the corrupted dataset path
-    # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
+    # Check if the corrupted dataset already exists
     if os.path.exists(corrupted_dataset_path):
         if force:
             shutil.rmtree(corrupted_dataset_path)
@@ -61,18 +63,20 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
             raise FileExistsError(
                 f"The corrupted dataset already exists at {corrupted_dataset_path}. Use --force to overwrite it.")
 
-    # Copy ignoring .wav files
+    # Copy the original dataset to the corrupted dataset path
+    # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
     copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
 
     print(f"Original dataset copied to {corrupted_dataset_path}")
 
-    # Corrupt the dataset
+    # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
     corruption = corruption_class(corruption_config)
 
     # Metadata for the corrupted dataset
     robuser_metadata = {}
 
+    # Corrupt the dataset
     for file_path in tqdm(annotated_files_dict, desc="Corrupting dataset"):
         # Load the audio file
         audio, sr = librosa.load(file_path, sr=None)
