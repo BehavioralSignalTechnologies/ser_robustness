@@ -10,8 +10,10 @@ import os
 import string
 import argparse
 
+from parsing.parser import Parser
 
-class ParserForIEMOCAP:
+
+class ParserForIEMOCAP(Parser):
     """!
     @brief Parser for the IEMOCAP dataset, finding all the audio
            utterances and corresponding annotations, based on the
