@@ -1,10 +1,11 @@
 import argparse
-import json
+import itertools
 import os
 import shutil
 import sys
 
 import librosa
+import yaml
 from scipy.io import wavfile
 from tqdm import tqdm
 
@@ -36,8 +37,8 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
                 shutil.copy2(file_path, output_file_path)
 
 
-def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
-            force=False):
+def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
+                    force=False):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
 
@@ -77,7 +78,7 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
     robuser_metadata = {}
 
     # Corrupt the dataset
-    for file_path in tqdm(annotated_files_dict, desc="Corrupting dataset"):
+    for file_path in tqdm(annotated_files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"):
         # Load the audio file
         audio, sr = librosa.load(file_path, sr=None)
         augmented_audio, noise_type = corruption.run(audio, sr)
@@ -104,6 +105,51 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
         print(f"Metadata saved to {metadata_path}")
 
 
+def parse_config(config):
+    """
+    Parses the configuration for the corruptions.
+
+    Args:
+        config (dict): configuration for the corruptions
+
+    Returns:
+        list of tuples: list of tuples with the corruption type and configuration
+    """
+    corruptions = []
+
+    for corruption_type, corruption_config in config.items():
+        if not corruption_config.pop("enabled", False):
+            continue
+
+        for values in itertools.product(*corruption_config.values()):
+            corruptions.append([corruption_type, dict(zip(corruption_config, values))])
+
+    print(f"Will apply the following {len(corruptions)} corruptions:")
+    for corruption in corruptions:
+        print(corruption)
+
+    return corruptions
+
+
+def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False):
+    """
+    Corrupts the original dataset with the specified corruption type and configuration.
+
+    Args:
+        dataset_name (str): name of the dataset (e.g. iemocap)
+        original_dataset_path (str): path to the original dataset
+        corrupted_datasets_path (str): path to the corrupted datasets
+        corruptions_config (dict): configuration for the corruption
+        force (bool): force overwrite the corrupted dataset if it already exists
+    """
+
+    corruptions_list = parse_config(corruptions_config)
+    for corruption_type, corruption_config in corruptions_list:
+        corrupted_dataset_path = os.path.join(corrupted_datasets_path, f"{corruption_type}_{corruption_config}")
+        corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
+                        force)
+
+
 def parse_arguments():
     """!
     @brief Parse Arguments for corrupting the dataset.
@@ -112,22 +158,20 @@ def parse_arguments():
     args_parser.add_argument('-i', '--input', required=True,
                              help="Path of the original dataset")
     args_parser.add_argument('-o', '--output', required=True,
-                             help="Path of the corrupted dataset")
+                             help="Path where the corrupted versions of the dataset will be saved")
     args_parser.add_argument('-f', '--force', action="store_true",
                              help="Force overwrite the corrupted dataset if it already exists")
     args_parser.add_argument('-d', '--dataset', required=True,
                              help="Name of the dataset (e.g. iemocap)")
-    args_parser.add_argument('-t', '--type', required=True,
-                             help="Type of corruption (e.g. content)")
-    args_parser.add_argument('-c', '--config', required=True, type=json.loads,
-                             help="Configuration for the corruption")
+    args_parser.add_argument('-c', '--config', required=True, type=str,
+                             help="Path to the YAML configuration for the corruptions")
     return args_parser.parse_args()
 
 
 if __name__ == '__main__':
-    # command line example:
-    # python3 corrupt_dataset.py -i /data_drive/iemocap -o /data_drive/iemocap_corrupted -d iemocap -t content -c '{"content_dataset_path": "/data_drive/ESC-50-master", "snr": 0}'
-
     args = parse_arguments()
 
-    corrupt(args.input, args.output, args.dataset, args.type, args.config, args.force)
+    with open(args.config, "r") as file:
+        config = yaml.safe_load(file)
+
+    corrupt(args.dataset, args.input, args.output, config, args.force)
