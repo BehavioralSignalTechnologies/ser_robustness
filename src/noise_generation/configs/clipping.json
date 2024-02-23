@@ -1,0 +1,5 @@
+{
+    "min_percentile_threshold": 0,
+    "max_percentile_threshold": 40,
+    "p_clipping": 1.0
+}
