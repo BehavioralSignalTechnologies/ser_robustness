@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 if file.endswith(".wav"):
                     print(os.path.join(root, file))
                     audio_files.append(os.path.join(root, file))
-                    if len(audio_files) == 3:
+                    if len(audio_files) == 5:
                         return audio_files
 
 
