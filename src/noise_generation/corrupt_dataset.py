@@ -55,6 +55,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     parser_class = get_parser_for_dataset(dataset_name)
     parser = parser_class(original_dataset_path)
     annotated_files_dict = parser.run_parser()
+    annotated_files_dict = dict(sorted(annotated_files_dict.items()))
 
     # Check if the corrupted dataset already exists
     if os.path.exists(corrupted_dataset_path):
