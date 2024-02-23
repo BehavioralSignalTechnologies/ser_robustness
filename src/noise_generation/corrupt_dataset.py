@@ -131,16 +131,9 @@ def parse_config(config):
     return corruptions
 
 
-def get_corruption_path(corruption_type, corruption_config):
+def get_corruption_str(corruption_type, corruption_config):
     """
-    Returns the path for the corrupted dataset based on the corruption type and configuration.
-
-    Args:
-        corruption_type (str): type of corruption (e.g. content)
-        corruption_config (dict): configuration for the corruption
-
-    Returns:
-        str: path for the corrupted dataset
+    Returns a string representation of the corruption type and configuration.
     """
     config_str = ""
     for key, value in corruption_config.items():
@@ -169,7 +162,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
     corruptions_list = parse_config(corruptions_config)
     for corruption_type, corruption_config in corruptions_list:
         corrupted_dataset_path = os.path.join(corrupted_datasets_path,
-                                              get_corruption_path(corruption_type, corruption_config))
+                                              f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
                             corruption_config,
