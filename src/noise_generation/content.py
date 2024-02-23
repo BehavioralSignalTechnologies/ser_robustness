@@ -123,8 +123,9 @@ class ContentAugmentation(NoiseGeneration):
         :param sample_rate: the sample rate
         :return: the augmented audio data (numpy array)
         """
-        noise_signal = next(self.random_audio_generator)
-        noise_signal, noise_sample_rate = librosa.load(noise_signal, sr=None)
+        noise_filename = next(self.random_audio_generator)
+        noise_basename = os.path.basename(noise_filename)
+        noise_signal, noise_sample_rate = librosa.load(noise_filename, sr=None)
         # Resample
         if noise_sample_rate != sample_rate:
             noise_signal = librosa.resample(noise_signal, orig_sr=noise_sample_rate, target_sr=sample_rate)
@@ -145,7 +146,7 @@ class ContentAugmentation(NoiseGeneration):
         s_aug = self.apply_snr(signal, noise)
         s_aug = s_aug / np.abs(s_aug.max())
 
-        return s_aug
+        return s_aug, noise_basename
 
 
 if __name__ == "__main__":
@@ -160,7 +161,6 @@ if __name__ == "__main__":
         for root, dirs, files in os.walk(iemocap_dir):
             for file in files:
                 if file.endswith(".wav"):
-                    print(os.path.join(root, file))
                     audio_files.append(os.path.join(root, file))
                     if len(audio_files) == 10:
                         return audio_files
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     for snr in [0, 5, 10, 20]:
         config = {
-            "content_dataset_path": "/data_drive/ESC-50-master",
+            "content_dataset_path": "/data_drive/urbansound8k",
             "snr": snr
         }
         augmentation = ContentAugmentation(config)
@@ -178,6 +178,7 @@ if __name__ == "__main__":
         for audio_file in audio_files:
             shutil.copy(audio_file, ".")
             audio, sample_rate = librosa.load(audio_file, sr=None)
-            s_aug = augmentation.run(audio, sample_rate)
+            s_aug, noise_filename = augmentation.run(audio, sample_rate)
+            print("Noise: ", noise_filename)
             basename = os.path.basename(audio_file)
             wavfile.write(f"augmented_{basename}_snr_{snr}.wav", sample_rate, s_aug)

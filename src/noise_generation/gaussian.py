@@ -28,7 +28,7 @@ class AWGNAugmentation(NoiseGeneration):
         :param sample_rate: the sample rate
         :return: the augmented audio data (numpy array)
         """
-        return self.transform(audio_data, sample_rate)
+        return self.transform(audio_data, sample_rate), None
 
 
 if __name__ == "__main__":
@@ -62,6 +62,6 @@ if __name__ == "__main__":
         for audio_file in audio_files:
             shutil.copy(audio_file, ".")
             audio, sample_rate = librosa.load(audio_file, sr=None)
-            s_aug = augmentation.run(audio, sample_rate)
+            s_aug, _ = augmentation.run(audio, sample_rate)
             basename = os.path.basename(audio_file)
             wavfile.write(f"augmented_{basename}_snr_{snr}.wav", sample_rate, s_aug)

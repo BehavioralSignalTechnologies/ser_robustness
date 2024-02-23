@@ -31,6 +31,6 @@ class NoiseGeneration:
 
         :param audio_data: numpy array with the audio data
         :param sample_rate: the sample rate
-        :return: the augmented audio data (numpy array)
+        :return: tuple with the augmented audio data (numpy array) and the applied noise (or None)
         """
         raise NotImplementedError
