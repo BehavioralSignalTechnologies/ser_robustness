@@ -6,7 +6,7 @@ authors = ["behavioral signals"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 psycopg2-binary = "^2.9.7"
 pyyaml = "^6.0.1"
 audiomentations = "^0.34.1"
