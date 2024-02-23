@@ -1,6 +1,7 @@
 # ESC50 dataset: https://github.com/karolpiczak/ESC-50
 # UrbanSound8K dataset: Use the script here: https://github.com/soundata/soundata#quick-example
 # MUSAN dataset: https://www.openslr.org/resources/17/musan.tar.gz
+
 import os
 import random
 import shutil
@@ -121,15 +122,19 @@ class ContentAugmentation(NoiseGeneration):
 
         :param audio_data: numpy array with the audio data
         :param sample_rate: the sample rate
-        :return: the augmented audio data (numpy array)
+        :return: tuple of the augmented audio data (numpy array) and the applied noise filename
         """
+
+        # Load a random noise from the dataset
         noise_filename = next(self.random_audio_generator)
         noise_basename = os.path.basename(noise_filename)
         noise_signal, noise_sample_rate = librosa.load(noise_filename, sr=None)
-        # Resample
+
+        # Resample the noise to match the sample rate of the audio data
         if noise_sample_rate != sample_rate:
             noise_signal = librosa.resample(noise_signal, orig_sr=noise_sample_rate, target_sr=sample_rate)
 
+        # Normalize the audio data and the noise
         signal = normalize_audio(audio_data)
         noise = normalize_audio(noise_signal)
         ts = len(signal)  # Duration of the initial audio signal
@@ -143,6 +148,7 @@ class ContentAugmentation(NoiseGeneration):
             pad_end = ts - tn - pad_front
             noise = np.pad(noise, (pad_front, pad_end), mode='constant')
 
+        # Apply the SNR and normalize the augmented signal
         s_aug = self.apply_snr(signal, noise)
         s_aug = s_aug / np.abs(s_aug.max())
 
