@@ -131,6 +131,28 @@ def parse_config(config):
     return corruptions
 
 
+def get_corruption_path(corruption_type, corruption_config):
+    """
+    Returns the path for the corrupted dataset based on the corruption type and configuration.
+
+    Args:
+        corruption_type (str): type of corruption (e.g. content)
+        corruption_config (dict): configuration for the corruption
+
+    Returns:
+        str: path for the corrupted dataset
+    """
+    config = corruption_config.copy()
+    # Remove the enabled key from the configuration
+    config.pop("enabled", None)
+    # Remove full paths from the configuration
+    config = {key: str(value).split("/")[-1] for key, value in config.items()}
+
+    config_str = "_".join(config.values())
+
+    return corruption_type + "_" + config_str
+
+
 def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
@@ -145,9 +167,15 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
 
     corruptions_list = parse_config(corruptions_config)
     for corruption_type, corruption_config in corruptions_list:
-        corrupted_dataset_path = os.path.join(corrupted_datasets_path, f"{corruption_type}_{corruption_config}")
-        corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
-                        force)
+        corrupted_dataset_path = os.path.join(corrupted_datasets_path,
+                                              get_corruption_path(corruption_type, corruption_config))
+        try:
+            corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
+                            corruption_config,
+                            force)
+        except Exception as e:
+            print(f"Error while corrupting the dataset with '{corruption_type}' corruption: {e}")
+            shutil.rmtree(corrupted_dataset_path, ignore_errors=True)
 
 
 def parse_arguments():
