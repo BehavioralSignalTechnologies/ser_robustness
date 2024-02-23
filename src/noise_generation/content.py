@@ -3,6 +3,7 @@
 # MUSAN dataset: https://www.openslr.org/resources/17/musan.tar.gz
 import os
 import random
+import shutil
 import warnings
 from itertools import cycle
 
@@ -16,7 +17,7 @@ from utils import normalize_audio
 
 class ContentAugmentation(NoiseGeneration):
     """
-    ContentAugmentation class
+    Class that augments the audio data with content from a sound dataset
     config should contain:
         * content_dataset_path: the path to the dataset
         * content_dataset_name: the name of the dataset (ESC50, UrbanSound8K, MUSAN)
@@ -119,14 +120,13 @@ class ContentAugmentation(NoiseGeneration):
 
     def run(self, audio_data, sample_rate):
         """
-        Run the augmentation methods
+        Run the augmentation method
 
         :param audio_data: numpy array with the audio data
         :param sample_rate: the sample rate
         :return: the augmented audio data (numpy array)
         """
         noise_signal = next(self.random_audio_generator)
-        print("Selected noise signal: ", noise_signal)
         noise_signal, noise_sample_rate = librosa.load(noise_signal, sr=None)
         # Resample
         if noise_sample_rate != sample_rate:
@@ -152,6 +152,25 @@ class ContentAugmentation(NoiseGeneration):
 
 
 if __name__ == "__main__":
+
+    iemocap_dir = "/data_drive/iemocap/Session5/sentences/wav/"
+
+
+    # find 10 random files from ieomcap_dir
+    def foo():
+        audio_files = []
+
+        for root, dirs, files in os.walk(iemocap_dir):
+            for file in files:
+                if file.endswith(".wav"):
+                    print(os.path.join(root, file))
+                    audio_files.append(os.path.join(root, file))
+                    if len(audio_files) == 10:
+                        return audio_files
+
+
+    audio_files = foo()
+
     for snr in [0, 5, 10, 20]:
         config = {
             "content_dataset_path": "/data_drive/ESC-50-master",
@@ -160,7 +179,9 @@ if __name__ == "__main__":
         }
         augmentation = ContentAugmentation(config)
 
-        audio, sample_rate = librosa.load(
-            "/data_drive/iemocap/Session5/sentences/wav/Ses05F_impro01/Ses05F_impro01_F001.wav", sr=None)
-        s_aug = augmentation.run(audio, sample_rate)
-        wavfile.write(f"augmented_audio_snr_{snr}.wav", sample_rate, s_aug)
+        for audio_file in audio_files:
+            shutil.copy(audio_file, ".")
+            audio, sample_rate = librosa.load(audio_file, sr=None)
+            s_aug = augmentation.run(audio, sample_rate)
+            basename = os.path.basename(audio_file)
+            wavfile.write(f"augmented_{basename}_snr_{snr}.wav", sample_rate, s_aug)
