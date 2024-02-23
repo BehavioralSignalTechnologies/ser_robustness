@@ -21,5 +21,5 @@ poetry install --no-root
 
 # Code Structure
 
-- `parsing`: contains the code for parsing the datasets.
+- `src/parsing`: contains the code for parsing the datasets.
 - `src/evaluation`: contains the code for evaluating the model predictions.
