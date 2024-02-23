@@ -71,7 +71,7 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
     corruption = corruption_class(corruption_config)
 
     # Metadata for the corrupted dataset
-    robuster_metadata = {}
+    robuser_metadata = {}
 
     for file_path in tqdm(annotated_files_dict, desc="Corrupting dataset"):
         # Load the audio file
@@ -83,18 +83,18 @@ def corrupt(original_dataset_path, corrupted_dataset_path, dataset_name, corrupt
         output_file_path = os.path.join(corrupted_dataset_path, relative_path)
 
         # Save the corrupted audio file
-        robuster_metadata[output_file_path] = noise_type
+        robuser_metadata[output_file_path] = noise_type
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
         wavfile.write(output_file_path, sr, augmented_audio)
 
     # Save the metadata
-    if not all(value is None for value in robuster_metadata.values()):
-        metadata_path = os.path.join(corrupted_dataset_path, "robuster_metadata.csv")
+    if not all(value is None for value in robuser_metadata.values()):
+        metadata_path = os.path.join(corrupted_dataset_path, "robuser_metadata.csv")
 
         # Save as CSV
         with open(metadata_path, "w") as file:
             file.write("file_path,noise_type\n")
-            for key, value in robuster_metadata.items():
+            for key, value in robuser_metadata.items():
                 file.write(f"{key},{value}\n")
 
         print(f"Metadata saved to {metadata_path}")
