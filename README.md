@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 💪 ROBUSER [TODO]
 A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER) 💬
 
