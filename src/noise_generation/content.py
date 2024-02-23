@@ -20,7 +20,6 @@ class ContentAugmentation(NoiseGeneration):
     Class that augments the audio data with content from a sound dataset
     config should contain:
         * content_dataset_path: the path to the dataset
-        * content_dataset_name: the name of the dataset (ESC50, UrbanSound8K, MUSAN)
         * snr: the signal-to-noise ratio
     """
 
@@ -33,8 +32,6 @@ class ContentAugmentation(NoiseGeneration):
         super().__init__(config)
         if "content_dataset_path" not in config:
             raise ValueError("content_dataset_path is not in the config")
-        if "content_dataset_name" not in config:
-            raise ValueError("content_dataset_name is not in the config")
         if "snr" not in config:
             raise ValueError("SNR is not in the config")
 
@@ -174,7 +171,6 @@ if __name__ == "__main__":
     for snr in [0, 5, 10, 20]:
         config = {
             "content_dataset_path": "/data_drive/ESC-50-master",
-            "content_dataset_name": "ESC50",
             "snr": snr
         }
         augmentation = ContentAugmentation(config)
