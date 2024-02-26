@@ -1,7 +1,25 @@
-# ser_robustness
-A robustness evaluation benchmarking procedure for SER
+# 💪 ROBUSER [TODO]
+A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER) 💬
 
-# Code Structure
+[TODO]
 
-- `parsing`: contains the code for parsing the datasets.
-- `evaluation`: contains the code for evaluating the model predictions.
+## 📑 Input dataset structure 
+
+[TODO]
+
+## 💁 Installation guidelines
+
+- Install & activate poetry
+
+```
+pip3 install poetry
+sudo apt-get install libasound2-dev
+```
+
+```
+poetry shell
+poetry install --no-root
+```
+
+> The dependencies have been installed 👏
+
