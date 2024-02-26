@@ -153,38 +153,3 @@ class ContentCorruption(NoiseGeneration):
         s_aug = s_aug / np.abs(s_aug.max())
 
         return s_aug, noise_basename
-
-
-if __name__ == "__main__":
-
-    iemocap_dir = "/data_drive/iemocap/Session5/sentences/wav/"
-
-
-    # find 10 random files from ieomcap_dir
-    def foo():
-        audio_files = []
-
-        for root, dirs, files in os.walk(iemocap_dir):
-            for file in files:
-                if file.endswith(".wav"):
-                    audio_files.append(os.path.join(root, file))
-                    if len(audio_files) == 10:
-                        return audio_files
-
-
-    audio_files = foo()
-
-    for snr in [0, 5, 10, 20]:
-        config = {
-            "content_dataset_path": "/data_drive/urbansound8k",
-            "snr": snr
-        }
-        augmentation = ContentCorruption(config)
-
-        for audio_file in audio_files:
-            shutil.copy(audio_file, ".")
-            audio, sample_rate = librosa.load(audio_file, sr=None)
-            s_aug, noise_filename = augmentation.run(audio, sample_rate)
-            print("Noise: ", noise_filename)
-            basename = os.path.basename(audio_file)
-            wavfile.write(f"augmented_{basename}_snr_{snr}.wav", sample_rate, s_aug)
