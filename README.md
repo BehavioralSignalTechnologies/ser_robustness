@@ -13,6 +13,7 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 
 ```
 pip3 install poetry
+sudo apt install ffmpeg
 sudo apt-get install libasound2-dev
 ```
 
