@@ -51,3 +51,42 @@ class AddGainTransition(NoiseGeneration):
         )
 
         return transform(audio_data, sample_rate), None
+
+if __name__ == "__main__":
+    import os, shutil, librosa
+    from scipy.io import wavfile
+
+    iemocap_dir = "/home/ubuntu/ser_robustness/iemocap/Session5/sentences/wav/"
+
+    # find 3 random files from ieomcap_dir
+    def foo():
+        audio_files = []
+
+        for root, dirs, files in os.walk(iemocap_dir):
+            for file in files:
+                if file.endswith(".wav"):
+                    print(os.path.join(root, file))
+                    audio_files.append(os.path.join(root, file))
+                    if len(audio_files) == 5:
+                        return audio_files
+
+
+    audio_files = foo()
+
+    config = {
+        "min_gain_db": -24,
+        "max_gain_db": 6,
+        "min_duration": 1,
+        "max_duration": 3,
+        "duration_unit": "fraction",
+        "p_gain": 1.0
+    }
+
+    augmentation = AddGainTransition(config)
+
+    for audio_file in audio_files:
+        shutil.copy(audio_file, ".")
+        audio, sample_rate = librosa.load(audio_file, sr=None)
+        s_aug, _ = augmentation.run(audio, sample_rate)
+        basename = os.path.basename(audio_file)
+        wavfile.write(f"{os.path.basename(audio_file).replace('.wav', '_fade.wav')}", sample_rate, s_aug)
