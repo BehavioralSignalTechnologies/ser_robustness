@@ -1,11 +1,8 @@
-import abc
 from pathlib import Path
 from subprocess import run, DEVNULL
 import os
-import shutil
-from tqdm import tqdm
 import soundfile as sf
-import numpy as np
+
 
 class Compression():
     """ A perturbator that compresses the audio file to a given bitrate using ffmpeg.
@@ -45,10 +42,6 @@ class Compression():
 
         run(f"{compression_command} && {conversion_command}", shell=True, check=False,
             stdout=DEVNULL, stderr=DEVNULL)
-
-compress = Compression(bitrate=16)
-
-wav_file = "/home/ubuntu/ser_robustness/src/noise_generation/Ses04F_impro03_F001.wav"
-compressed_file = f"{os.path.basename(wav_file).replace('.wav', '_compressed.wav')}"
-print(compressed_file)
-compress.perturb_audio(wav_file, compressed_file)
+        
+        # remove the .mp3 file
+        os.remove(compressed_path)
