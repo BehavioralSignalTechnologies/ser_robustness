@@ -9,7 +9,7 @@
     30% is drawn, the samples are clipped if they're below the 15th or above the 85th percentile.
 """
 
-from noises import NoiseGeneration
+from corruptions import NoiseGeneration
 from audiomentations import ClippingDistortion
 
 class AddClippingDistortion(NoiseGeneration):
