@@ -21,7 +21,7 @@ class AddImpulseResponse(NoiseGeneration):
         """
         super().__init__(config)
         self.ir_path = config["ir_path"]
-        self.p_reverb = config["p_reverb"]
+        self.p_reverb = 1.0
 
         if self.ir_path is None:
             raise ValueError(f"The {self.ir_path} is not provided."+
@@ -45,7 +45,7 @@ class AddImpulseResponse(NoiseGeneration):
             :return: the augmented audio data (numpy array)
         """
 
-        return self.transform(audio_data, sample_rate), os.path.basename(self.ir_path)
+        return self.transform(audio_data, sample_rate), None
 
 
 if __name__ == "__main__":
