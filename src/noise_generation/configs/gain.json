@@ -1,8 +1,0 @@
-{
-    "min_gain_db": -24.0,
-    "max_gain_db": 6.0,
-    "min_duration": 1,
-    "max_duration": 3,
-    "duration_unit": "fraction",
-    "p_gain": 1.0
-}
