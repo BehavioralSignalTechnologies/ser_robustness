@@ -29,7 +29,7 @@ clipping_distortion:
 impulse_response:
   enabled: true
   ir_path:
-    - EchoThiefImpulseResponseLibrary
+    - datasets/EchoThiefImpulseResponseLibrary
 compression:
   enabled: true
   bit_rate:
