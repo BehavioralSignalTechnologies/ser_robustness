@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+from utils import resample_dataset
 from parsing.get_parser import get_parser_for_dataset
 from noise_generation.get_corruption import get_corruption
 
@@ -27,7 +28,8 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
     if ignore_extensions is None:
         ignore_extensions = [".wav"]
 
-    for root, dirs, files in os.walk(original_dataset_path):
+    print(f"Copying the original dataset to: {corrupted_dataset_path}")    
+    for root, _, files in os.walk(original_dataset_path):
         for file in files:
             if not any([file.endswith(extension) for extension in ignore_extensions]):
                 file_path = os.path.join(root, file)
@@ -69,11 +71,13 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
     copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
 
-    print(f"Saving the corrupted dataset to: {corrupted_dataset_path}")
-
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
     corruption = corruption_class(corruption_config)
+
+    if corruption_type == "impulse_response":
+        # Resample the reverberation dataset to the dataset's sample rate
+        resample_dataset(original_dataset_path, corruption_config['ir_path'])
 
     # Metadata for the corrupted dataset
     robuser_metadata = {}
@@ -166,8 +170,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
                                               f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
-                            corruption_config,
-                            force)
+                            corruption_config,force)
             with open(os.path.join(corrupted_dataset_path, "robuser_config.yaml"), "w") as file_:
                 yaml.dump(corruption_config, file_)
         except Exception as e:
