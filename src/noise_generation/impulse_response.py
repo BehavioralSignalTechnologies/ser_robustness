@@ -8,7 +8,7 @@
     *download the echo thief impulse response dataset: http://www.echothief.com/downloads/
 """
 import os
-from noises import NoiseGeneration
+from corruptions import NoiseGeneration
 from audiomentations import ApplyImpulseResponse
 
 

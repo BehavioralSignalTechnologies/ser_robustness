@@ -14,7 +14,7 @@
         `p_gain` (float): the probability of applying gain transition
 """
 
-from noises import NoiseGeneration
+from corruptions import NoiseGeneration
 from audiomentations import GainTransition
 
 class AddGainTransition(NoiseGeneration):
