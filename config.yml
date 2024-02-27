@@ -14,3 +14,25 @@ gaussian:
     - 0
     - 10
     - 20
+gain_transition:
+  enabled: true
+  duration:
+    - 0.1
+    - 0.2
+    - 0.3
+clipping_distortion:
+  enabled: true
+  max_percentile_threshold: 
+    - 20
+    - 40
+    - 60
+impulse_response:
+  enabled: true
+  ir_path:
+    - EchoThiefImpulseResponseLibrary
+compression:
+  enabled: true
+  bit_rate:
+    - 8
+    - 16
+    - 32
