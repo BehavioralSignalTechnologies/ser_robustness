@@ -3,45 +3,34 @@ from subprocess import run, DEVNULL
 import os
 import soundfile as sf
 
+from corruptions import NoiseGeneration
 
-class Compression():
-    """ A perturbator that compresses the audio file to a given bitrate using ffmpeg.
+
+class Compression(NoiseGeneration):
+    """ A perturbator that compresses the audio file to a given bit_rate using ffmpeg.
     The file is being compressed to the given format, then converted back to wav at
     the original sample rate with 1 channel.
     """
 
-    def __init__(self, bitrate: int, compression_format: str = "mp3"):
+    def __init__(self, config):
         """ Initialize the perturbator.
         Args:
-            bitrate: The bitrate to compress the audio to. The number you give will be
-                transformed to <bitrate>k. E.g. 32 -> 32k -> 32000 bits per second.
-            compression_format: The compression format to use.
+            config
+                bit_rate: The bit_rate to compress the audio to. The number you give will be
+                transformed to <bit_rate>k. E.g. 32 -> 32k -> 32000 bits per second.
         """
+        super().__init__(config)
+        self.format = "mp3"
+        self.bit_rate = config["bit_rate"]
 
-        self.bitrate = bitrate
+    def run(self, audio_data, sample_rate, output_file_path):
+        compressed_path = Path(audio_data).with_suffix(f".{self.format}")
 
-        assert compression_format in ["mp3", "aac"] , f"format: {compression_format} is not supported"
-        self.format = compression_format
+        compression_command = f"ffmpeg -i {audio_data} -b:a {self.bit_rate}k {compressed_path}"
+        conversion_command = f"ffmpeg -i {compressed_path} -ac 1 -ar {sample_rate} {output_file_path}"
 
-    def perturb_audio(self, input_path: str, output_path: str):
-
-        if not output_path.endswith(".wav"):
-            print(f"WARNING: output_path: `{output_path}` doesn't have .wav suffix - "
-                  f"Replacing {Path(output_path).suffix} with .wav")
-            output_path = Path(output_path).with_suffix(".wav")
-
-        assert not os.path.exists(output_path), f"output_path: {output_path} already exists. Specify a new path."
-
-        compressed_path = Path(input_path).with_suffix(f".{self.format}")
-
-        with sf.SoundFile(input_path, 'r') as audio_file:
-            sample_rate = audio_file.samplerate
-
-        compression_command = f"ffmpeg -i {input_path} -b:a {self.bitrate}k {compressed_path}"
-        conversion_command = f"ffmpeg -i {compressed_path} -ac 1 -ar {sample_rate} {output_path}"
-
-        run(f"{compression_command} && {conversion_command}", shell=True, check=False,
+        run(f"{compression_command} && {conversion_command}", 
+            shell=True, check=False,
             stdout=DEVNULL, stderr=DEVNULL)
         
-        # remove the .mp3 file
         os.remove(compressed_path)
