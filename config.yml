@@ -17,9 +17,9 @@ gaussian:
 gain_transition:
   enabled: true
   duration:
-    - 0.1
     - 0.2
     - 0.3
+    - 0.5
 clipping_distortion:
   enabled: true
   max_percentile_threshold: 
