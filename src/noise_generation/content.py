@@ -12,7 +12,7 @@ import librosa
 import numpy as np
 from scipy.io import wavfile
 
-from noises import NoiseGeneration
+from corruptions import NoiseGeneration
 from utils import normalize_audio
 
 

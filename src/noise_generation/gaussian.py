@@ -1,6 +1,5 @@
 from audiomentations import AddGaussianSNR
-
-from noises import NoiseGeneration
+from corruptions import NoiseGeneration
 
 
 class AWGNAugmentation(NoiseGeneration):

@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score, recall_score
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from parsing.iemocap import ParserForIEMOCAP
+from parsing.get_parser import get_parser_for_dataset
 
 
 def parse_csv(preds_csv):
@@ -38,7 +38,7 @@ def evaluate_iemocap(preds, targets):
     expected_classes = {"neutral", "happy", "sad", "angry"}
     pred_classes = set([pred["emotion"] for pred in preds.values()])
     target_classes = set([target["emotion"] for target in targets.values()])
-    
+
     if pred_classes - expected_classes != set():
         raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
     if pred_classes - expected_classes != set():
@@ -94,8 +94,9 @@ if __name__ == "__main__":
     args = parse_args()
 
     preds = parse_csv(args.predictions)
+    parser_class = get_parser_for_dataset(args.dataset)
     if args.dataset == "iemocap":
-        parser = ParserForIEMOCAP(args.data_path)
+        parser = parser_class(args.data_path)
         targets = parser.run_parser()
         targets = {os.path.basename(k): v for k, v in targets.items()}
         results = evaluate_iemocap(preds, targets)
