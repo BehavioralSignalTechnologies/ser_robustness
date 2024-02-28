@@ -76,7 +76,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     corruption = corruption_class(corruption_config)
 
     if corruption_type == "impulse_response":
-        # Resample the reverberation dataset to the dataset's sample rate
+        # Resample the reverberation dataset if needed
         resample_dataset(original_dataset_path, corruption_config['ir_path'])
 
     # Metadata for the corrupted dataset
@@ -84,18 +84,28 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
 
     # Corrupt the dataset
     for file_path in tqdm(annotated_files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"):
-        # Load the audio file
-        audio, sr = librosa.load(file_path, sr=None)
-        augmented_audio, noise_type = corruption.run(audio, sr)
+        if corruption_type == 'compression':
+            _, sr = librosa.load(file_path, sr=None)
 
-        # file_path is an absolute path, find the relative path to the original_dataset_path
-        relative_path = os.path.relpath(file_path, original_dataset_path)
-        output_file_path = os.path.join(corrupted_dataset_path, relative_path)
+            relative_path = os.path.relpath(file_path, original_dataset_path)
+            output_file_path = os.path.join(corrupted_dataset_path, relative_path)
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+            
+            corruption.run(file_path, sr, output_file_path) 
+            robuser_metadata[output_file_path] = None
+        else:
+            # Load the audio file
+            audio, sr = librosa.load(file_path, sr=None)        
+            augmented_audio, noise_type = corruption.run(audio, sr)
 
-        # Save the corrupted audio file
-        robuser_metadata[output_file_path] = noise_type
-        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-        wavfile.write(output_file_path, sr, augmented_audio)
+            # file_path is an absolute path, find the relative path to the original_dataset_path
+            relative_path = os.path.relpath(file_path, original_dataset_path)
+            output_file_path = os.path.join(corrupted_dataset_path, relative_path)
+
+            # Save the corrupted audio file
+            robuser_metadata[output_file_path] = noise_type
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+            wavfile.write(output_file_path, sr, augmented_audio)
 
     # Save the metadata
     if not all(value is None for value in robuser_metadata.values()):
