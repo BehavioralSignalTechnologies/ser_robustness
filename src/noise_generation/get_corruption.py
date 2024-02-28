@@ -3,7 +3,7 @@ from noise_generation.gaussian import AWGNAugmentation
 from noise_generation.gain_transition import AddGainTransition
 from noise_generation.clipping_distortion import AddClippingDistortion
 from noise_generation.impulse_response import AddImpulseResponse
-# from noise_generation.compression import Compression
+from noise_generation.compression import Compression
 
 
 def get_corruption(corruption_name):
@@ -16,6 +16,8 @@ def get_corruption(corruption_name):
     elif corruption_name == "clipping_distortion":
         return AddClippingDistortion
     elif corruption_name == "impulse_response":
-        return AddImpulseResponse
+        return AddImpulseResponse   
+    elif corruption_name == "compression":
+        return Compression
     else:
         raise ValueError(f"Unknown corruption: {corruption_name}")
