@@ -29,7 +29,7 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📈 Usage
 
-Edit the `config.yaml` file to specify the corruption types and levels you want to evaluate. Then, run the following command:
+Modify the `config.yaml` file to enable/disable the corruption types and specify levels you want to evaluate. Then you can run the `corruption_dataset.py` script. Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d <dataset_name>
@@ -45,3 +45,4 @@ python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_pat
 
 For detailed documentation, please refer to:
 -  [Corruption types](./docs/corruption_types.md) file, which outlines the supported types of corruptions.
+- [Configuration](.docs/configuration.md) file, which analyzes the configuration parameters.
