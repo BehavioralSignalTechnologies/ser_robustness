@@ -13,7 +13,7 @@ poetry shell
 poetry install --no-root
 ```
 
-- Install FFmpeg (for audio processing):
+- Install FFmpeg & libasound2-dev:
 
 ```
 sudo apt install ffmpeg libasound2-dev
