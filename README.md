@@ -1,4 +1,4 @@
-# 💪 ROBUSER [TODO]
+# 💪 ROBUSER
 A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER) 💬
 
 
@@ -24,11 +24,14 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📈 Usage
 
-Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. Example:
+Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. 
+- Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d <dataset_name>
 ```
+
+>, where `dataset_path` is the path to the original dataset, `output_path` is the path to the corrupted dataset and `dataset_name` is the type of dataset (e.g. `iemocap`)
 
 
 # 🚀 Code Structure
