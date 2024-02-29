@@ -156,15 +156,17 @@ def get_corruption_str(corruption_type, corruption_config):
     for key, value in corruption_config.items():
         if key == "enabled":
             continue
-        if key == "content_dataset_path":
+        if key == "content_dataset_path" or key == "ir_path":
             config_str += f"_dataset_{os.path.basename(value)}"
+        elif isinstance(value, list):
+            config_str += f"_{key}_{'_'.join(map(str, value))}"
         else:
             config_str += f"_{key}_{value}"
 
     return corruption_type + config_str
 
 
-def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False):
+def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False, skip_copy=False):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
 
@@ -174,6 +176,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
         corrupted_datasets_path (str): path to the corrupted datasets
         corruptions_config (dict): configuration for the corruption
         force (bool): force overwrite the corrupted dataset if it already exists
+        skip_copy (bool): skip copying the original dataset to the corrupted dataset path
     """
 
     corruptions_list = parse_config(corruptions_config)
@@ -182,7 +185,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
                                               f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
-                            corruption_config, force)
+                            corruption_config, force, skip_copy)
             with open(os.path.join(corrupted_dataset_path, "robuser_config.yaml"), "w") as file_:
                 yaml.dump(corruption_config, file_)
         except Exception as e:
@@ -205,7 +208,7 @@ def parse_arguments():
                              help="Skip copying the original dataset to the corrupted dataset path and only generate the corrupted wav files.")
     args_parser.add_argument('-d', '--dataset', required=True,
                              help="Name of the dataset (e.g. iemocap)")
-    args_parser.add_argument('-c', '--config', required=True, type=str, default="config.yml",
+    args_parser.add_argument('-c', '--config', type=str, default="config.yml",
                              help="Path to the YAML configuration for the corruptions")
     return args_parser.parse_args()
 
@@ -216,4 +219,4 @@ if __name__ == '__main__':
     with open(args.config, "r") as file:
         config = yaml.safe_load(file)
 
-    corrupt(args.dataset, args.input, args.output, config, args.force)
+    corrupt(args.dataset, args.input, args.output, config, args.force, args.skip_copy)
