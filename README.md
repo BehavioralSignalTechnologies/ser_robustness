@@ -2,13 +2,8 @@
 A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER) 💬
 
 
-## 📑 Input dataset structure 
-
-[TODO]
-
 ## 💁 Installation guidelines
 
-To get started with ROBUSER, follow these simple steps:
 
 - Install & activate poetry (used for managing dependencies)
 
@@ -29,11 +24,12 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📈 Usage
 
-Modify the `config.yaml` file to enable/disable the corruption types and specify levels you want to evaluate. Then you can run the `corruption_dataset.py` script. Example:
+Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d <dataset_name>
 ```
+
 
 # 🚀 Code Structure
 
@@ -46,3 +42,7 @@ python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_pat
 For detailed documentation, please refer to:
 -  [Corruption types](./docs/corruption_types.md) file, which outlines the supported types of corruptions.
 - [Configuration](.docs/configuration.md) file, which analyzes the configuration parameters.
+
+## 📑 Supported Datasets
+
+Currently, only the `IEMOCAP` dataset is supported. [Download dataset](https://sail.usc.edu/iemocap/iemocap_release.htm)
