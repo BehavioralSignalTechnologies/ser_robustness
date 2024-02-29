@@ -75,11 +75,15 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
-    corruption = corruption_class(corruption_config)
 
     if corruption_type == "impulse_response":
         # Resample the reverberation dataset if needed
-        resample_dataset(original_dataset_path, corruption_config['ir_path'])
+        resampled_path = corruption_config['ir_path'] + "_resampled"
+        shutil.copytree(corruption_config['ir_path'], resampled_path, dirs_exist_ok=True)
+        resample_dataset(original_dataset_path, resampled_path)
+        corruption_config['ir_path'] = resampled_path
+
+    corruption = corruption_class(corruption_config)
 
     # Metadata for the corrupted dataset
     robuser_metadata = {}
