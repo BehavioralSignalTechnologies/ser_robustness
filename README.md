@@ -21,10 +21,19 @@ poetry install --no-root
 - Install FFmpeg (for audio processing):
 
 ```
-sudo apt install ffmpeg
+sudo apt install ffmpeg libasound2-dev
 ```
 
 > The dependencies have been installed 👏
+
+
+## 📈 Usage
+
+Edit the `config.yaml` file to specify the corruption types and levels you want to evaluate. Then, run the following command:
+
+```
+python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d <dataset_name>
+```
 
 # 🚀 Code Structure
 
