@@ -6,7 +6,7 @@ import sys
 
 import librosa
 import yaml
-from scipy.io import wavfile
+import soundfile as sf
 from tqdm import tqdm
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -107,7 +107,8 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
             # Save the corrupted audio file
             robuser_metadata[output_file_path] = noise_type
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-            wavfile.write(output_file_path, sr, augmented_audio)
+
+            sf.write(output_file_path, augmented_audio, sr)
 
     # Save the metadata
     if not all(value is None for value in robuser_metadata.values()):
