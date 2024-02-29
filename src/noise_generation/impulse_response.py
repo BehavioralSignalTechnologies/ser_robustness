@@ -7,6 +7,20 @@ import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
 from corruptions import NoiseGeneration
+from scipy.io import wavfile
+
+
+def calculate_rt60(impulse_response_path):
+    """
+    Calculate the RT60 of the impulse response
+        :param impulse_response_path: the path to the impulse response
+        :return: the RT60 in seconds
+    """
+    impulse_response, sample_rate = librosa.load(impulse_response_path, sr=None)
+    # Normalize the impulse response
+    norm_impulse_response = impulse_response / max(abs(impulse_response))
+    rt60 = pra.experimental.measure_rt60(norm_impulse_response, fs=sample_rate)
+    return rt60
 
 
 class AddImpulseResponse(NoiseGeneration):
@@ -42,21 +56,11 @@ class AddImpulseResponse(NoiseGeneration):
         print(f"Selected {len(self.selected_irs)} impulse responses from {self.ir_path}"
               f" with RT60 in range [{self.rt60_min}, {self.rt60_max}]")
 
-    def calculate_rt60(self, impulse_response_path):
-        """
-        Calculate the RT60 of the impulse response
-            :param impulse_response_path: the path to the impulse response
-            :return: the RT60 in seconds
-        """
-        impulse_response, sample_rate = librosa.load(impulse_response_path, sr=None)
-        rt60 = pra.experimental.measure_rt60(impulse_response, fs=sample_rate)
-        return rt60
-
     def load_dataset(self, path, rt60_min, rt60_max):
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith('.wav'):
-                    rt60 = self.calculate_rt60(os.path.join(root, file))
+                    rt60 = calculate_rt60(os.path.join(root, file))
                     if rt60_min <= rt60 <= rt60_max:
                         yield os.path.join(root, file)
 
