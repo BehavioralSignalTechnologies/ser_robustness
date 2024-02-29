@@ -4,6 +4,7 @@ import librosa
 import soundfile as sf
 import warnings
 
+
 def normalize_audio(signal):
     """A function to normalize a signal according to its mean and std.
 
@@ -50,5 +51,6 @@ def resample_dataset(folder_path, resampled_folder_path):
                     if not need_resampling:
                         need_resampling = True
                         warnings.warn(f"Resampling from {sr} to {target_sr}...")
-                    
+
+                    y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
                     sf.write(file_path, y, target_sr)
