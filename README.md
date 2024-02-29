@@ -43,8 +43,8 @@ python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_pat
 ## 📰 Documentation
 
 For detailed documentation, please refer to:
--  [Corruption types](./docs/corruption_types.md) file, which outlines the supported types of corruptions.
-- [Configuration](.docs/configuration.md) file, which analyzes the configuration parameters.
+-  [Corruption types](./docs/corruption_types.md), which outlines the supported types of corruptions.
+- [Configuration](.docs/configuration.md), which analyzes the configuration parameters.
 
 ## 📑 Supported Datasets
 
