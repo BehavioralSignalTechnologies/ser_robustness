@@ -30,6 +30,10 @@ impulse_response:
   enabled: true
   ir_path:
     - datasets/EchoThiefImpulseResponseLibrary
+  rt60_range:
+    - [0.1, 1.0]
+    - [1.0, 2.0]
+    - [2.0, 10.0]
 compression:
   enabled: true
   bit_rate:
