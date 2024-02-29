@@ -1,6 +1,6 @@
 # 📝 Configuration YAML File Guide
 
-This guide provides information about the configuration YAML file (`config.yaml`) used for the audio corruptions.
+This guide provides information about the configuration YAML file [`config.yaml`](../config.yml) used for the audio corruptions.
 
 ## 🏗️ Structure
 
