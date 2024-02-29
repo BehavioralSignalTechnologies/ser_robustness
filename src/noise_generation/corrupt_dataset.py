@@ -28,7 +28,7 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
     if ignore_extensions is None:
         ignore_extensions = [".wav"]
 
-    print(f"Copying the original dataset to: {corrupted_dataset_path}")    
+    print(f"Copying the original dataset to: {corrupted_dataset_path}")
     for root, _, files in os.walk(original_dataset_path):
         for file in files:
             if not any([file.endswith(extension) for extension in ignore_extensions]):
@@ -40,7 +40,7 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
 
 
 def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
-                    force=False):
+                    force=False, skip_copy=False):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
 
@@ -51,6 +51,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
         corruption_type (str): type of corruption (e.g. content)
         corruption_config (dict): configuration for the corruption
         force (bool): force overwrite the corrupted dataset if it already exists
+        skip_copy (bool): skip copying the original dataset to the corrupted dataset path
     """
 
     # Parse the original dataset
@@ -69,7 +70,8 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
 
     # Copy the original dataset to the corrupted dataset path
     # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
-    copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
+    if not skip_copy:
+        copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
@@ -90,12 +92,12 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
             relative_path = os.path.relpath(file_path, original_dataset_path)
             output_file_path = os.path.join(corrupted_dataset_path, relative_path)
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-            
-            corruption.run(file_path, sr, output_file_path) 
+
+            corruption.run(file_path, sr, output_file_path)
             robuser_metadata[output_file_path] = None
         else:
             # Load the audio file
-            audio, sr = librosa.load(file_path, sr=None)        
+            audio, sr = librosa.load(file_path, sr=None)
             augmented_audio, noise_type = corruption.run(audio, sr)
 
             # file_path is an absolute path, find the relative path to the original_dataset_path
@@ -180,7 +182,7 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
                                               f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
-                            corruption_config,force)
+                            corruption_config, force)
             with open(os.path.join(corrupted_dataset_path, "robuser_config.yaml"), "w") as file_:
                 yaml.dump(corruption_config, file_)
         except Exception as e:
@@ -199,9 +201,11 @@ def parse_arguments():
                              help="Path where the corrupted versions of the dataset will be saved")
     args_parser.add_argument('-f', '--force', action="store_true",
                              help="Force overwrite the corrupted dataset if it already exists")
+    args_parser.add_argument('-s', '--skip_copy', action="store_true",
+                             help="Skip copying the original dataset to the corrupted dataset path and only generate the corrupted wav files.")
     args_parser.add_argument('-d', '--dataset', required=True,
                              help="Name of the dataset (e.g. iemocap)")
-    args_parser.add_argument('-c', '--config', required=True, type=str,
+    args_parser.add_argument('-c', '--config', required=True, type=str, default="config.yml",
                              help="Path to the YAML configuration for the corruptions")
     return args_parser.parse_args()
 
