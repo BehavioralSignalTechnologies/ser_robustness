@@ -15,6 +15,9 @@ class AWGNAugmentation(NoiseGeneration):
 
         if "snr" not in config:
             raise ValueError("SNR is not in the config")
+        if not isinstance(config["snr"], int):
+            raise ValueError("SNR must be an integer")
+
         self.snr = config["snr"]
 
         self.transform = AddGaussianSNR(min_snr_in_db=self.snr, max_snr_in_db=self.snr, p=1.0)
