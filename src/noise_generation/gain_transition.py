@@ -1,5 +1,6 @@
 from corruptions import NoiseGeneration
 from audiomentations import GainTransition
+import random
 
 class AddGainTransition(NoiseGeneration):
     """
@@ -29,7 +30,8 @@ class AddGainTransition(NoiseGeneration):
             raise ValueError("min_max_gain_db must be a list of \
                              [min_gain_db, max_gain_db] pair")
 
-        self.min_gain_dbš, self.max_gain_db = config["min_max_gain_db"]
+        random.seed(42)
+        self.min_gain_db, self.max_gain_db = config["min_max_gain_db"]
         self.min_duration = 0.5
         self.max_duration = 0.5
         self.duration_unit = "fraction"
