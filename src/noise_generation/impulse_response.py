@@ -1,13 +1,11 @@
 import os
 import random
-import shutil
 
 import librosa
 import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
 from corruptions import NoiseGeneration
-from scipy.io import wavfile
 
 
 def calculate_rt60(impulse_response_path):
