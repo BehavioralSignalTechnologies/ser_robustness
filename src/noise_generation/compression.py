@@ -23,6 +23,9 @@ class Compression(NoiseGeneration):
         self.format = "mp3"
         self.bit_rate = config["bit_rate"]
 
+        if not isinstance(self.bit_rate, int) or self.bit_rate < 8 or self.bit_rate > 192:
+            raise ValueError("`bit_rate` must be an integer between 8 and 192kHz.")
+
     def run(self, audio_data, sample_rate, output_file_path):
         compressed_path = Path(audio_data).with_suffix(f".{self.format}")
 
