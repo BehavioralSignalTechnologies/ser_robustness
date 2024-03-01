@@ -1,16 +1,19 @@
-# Corruption Generation Types 🦾
+# Corruption Types 🦾
 
-Here, we describe various types of noises and effects generated, including background noises, gain transition *(known as fade in/out)*, gaussian noise, impulse response effects, clipping distortion and compression artifacts.
+Here, we describe the various types of noises and effects applied to the clean dataset and the parameters that can be adjusted to customize the corruption process.
+For a detailed explanation of the configuration file, refer to the [Configuration](configuration.md) section.
+
 
 ## Background Noises 🚦
 
 Background noises are generated with a chosen Signal-to-Noise Ratio (SNR) value to simulate different environments.
+Configure the `content` section in the `config.yml` file to add background noise to the clean dataset.
 
-### Datasets & SNRs:
+### Download the datasets
 
-- [**ESC50**](https://github.com/karoldvl/ESC-50/archive/master.zip) SNR: [0dB, 10dB, 20dB]
-- [**MUSAN**](https://www.openslr.org/resources/17/musan.tar.gz) SNR: [0dB, 10dB, 20dB]
-- [**UrbanSound8K** ](https://github.com/soundata/soundata#quick-example)SNR: [0dB, 10dB, 20dB]
+- [**ESC50**](https://github.com/karoldvl/ESC-50/archive/master.zip)
+- [**MUSAN**](https://www.openslr.org/resources/17/musan.tar.gz)
+- [**UrbanSound8K** ](https://github.com/soundata/soundata#quick-example)
 
 > To download `ESC50` and `MUSAN` use the provided links. For `UrbanSound8K`, follow the instructions below:
 
@@ -25,45 +28,67 @@ python3
 >> dataset.download()
 ```
 
+### Default SNR values:
+- 0dB
+- 10dB
+- 20dB
+
 ## GaussianSNR Noise 💨
 
-Gaussian noise is a kind of white noise that is added to the audio signal. It applies an SNR that is chosen randomly from a uniform distribution on the decibel scale.
+Add White Gaussian Noise to the clean dataset with different Signal-to-Noise Ratio (SNR) levels.
+Configure the `gaussian` section in the `config.yml` file to add Gaussian noise to the clean dataset.
 
-### Different SNR values:
+### Default SNR values:
 - 0dB
 - 10dB
 - 20dB
 
 ## Impulse Response Effects 🚇
 
-Impulse responses are applied to emulate acoustic environments like underground passages, underpasses, stairwells, etc., sourced from the [EchoThief Impulse Response Library](http://www.echothief.com/wp-content/uploads/2016/06/EchoThiefImpulseResponseLibrary.zip) dataset.
+Impulse responses are applied to emulate acoustic environments like underground passages, underpasses, stairwells, etc.
+A random impulse response within a given range of RT60 values from the dataset is convolved with the clean audio to simulate the effect of the environment on the sound.
+Configure the `impulse_response` section in the `config.yml` file to apply impulse response effects to the clean dataset.
 
+### Download the dataset
+- [**EchoThief Impulse Response Library**](http://www.echothief.com/wp-content/uploads/2016/06/EchoThiefImpulseResponseLibrary.zip)
+
+### Default RT60 range values:
+- 0.1-0.5
+- 0.5-1.5
+- 1.5-5.0
 
 ## Clipping Distortion 📶
 
-The signal is distorted by clipping a random percentage of points. The percentage of points to be clipped is drawn from a uniform distribution between the `min_percentile_threshold` and `max_percentile_threshold`. For instance, if 30% is drawn, samples below the 15th or above the 85th percentile are clipped.
+The signal is distorted by clipping a random percentage of points. The percentage of points to be clipped is drawn from a uniform distribution between 0 and `max_percentile_threshold`. For instance, if 30% is drawn, samples below the 15th or above the 85th percentile are clipped.
+Configure the `clipping_distortion` section in the `config.yml` file to apply clipping distortion to the clean dataset.
 
-### Clipping Distortion parameters:
-- `min_percentile_threshold` (int): 0
-- `max_percentile_threshold` (int): 40
+### Default max_percentile_threshold values:
+- 20
+- 40
+- 60
 
 
 ## Gain Transition 〽️
 
-Gain transition effect is applied to gradually change the volume up or down over a random time span. Also known as fade in and fade out.
+Gain transition effect is applied to gradually change the volume up or down over a time span. Also known as fade in and fade out.
+It applies a gain transition to the clean audio with a random duration.
+Configure the `gain_transition` section in the `config.yml` file to apply gain transition to the clean dataset.
 
-### Gain Transition parameters:
-- `min_gain_db`: the minimum gain in dB
-- `max_gain_db`: the maximum gain in dB
-- `min_duration` (Union[float, int]): the minimum duration of the gain transition
-- `max_duration` (Union[float, int]): the maximum duration of the gain transition
-- `duration_unit` (str • choices: "fraction", "seconds"): the unit of the value of `min_duration` and `max_duration` 
+
+### Default min_max_gain_db:
+- [-40.0,-20.0]
+- [-30.0,-10.0]
+- [-20.0,0]
 
 
 ## Compression Artifacts 🎛️
 
-Compression artifacts are generated by compressing an audio file to a given bit_rate using `ffmpeg`. The file is being compressed to an .mp3 format, then converted back to wav at the original sample rate with 1 channel.
+Compression artifacts are generated by compressing an audio file to a given bit_rate using `ffmpeg`.
+The file is being compressed to an .mp3 format, then converted back to wav at the original sample rate with 1 channel.
+Configure the `compression` section in the `config.yml` file to apply compression artifacts to the clean dataset.
     
 
-### Compression parameters:
-- `bit_rate` (int): The bit rate to compress the audio to. The number you give will be transformed to <bit_rate>k. E.g. if `bit_rate` is set to `32` -> 32k -> 32000 bits per second.
+### Default bit_rate values:
+- 8kbps
+- 16kbps
+- 32kbps
