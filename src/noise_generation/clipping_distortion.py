@@ -19,7 +19,15 @@ class AddClippingDistortion(NoiseGeneration):
             :param config: dictionary with the configuration parameters
         """
         super().__init__(config)
+
+        if "max_percentile_threshold" not in config:
+            raise ValueError("'max_percentile_threshold' is a required parameter")
+        
         self.max_percentile_threshold = config["max_percentile_threshold"]
+
+        if not isinstance(self.max_percentile_threshold, int):
+            raise ValueError("'max_percentile_threshold' must be an integer")
+
         self.p_clipping = 1.0
 
     def run(self, audio_data, sample_rate):
