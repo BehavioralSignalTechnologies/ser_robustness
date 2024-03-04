@@ -55,10 +55,18 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     """
 
     # Parse the original dataset
-    parser_class = get_parser_for_dataset(dataset_name)
-    parser = parser_class(original_dataset_path)
-    annotated_files_dict = parser.run_parser()
-    annotated_files_dict = dict(sorted(annotated_files_dict.items()))
+    if dataset_name != None:
+        parser_class = get_parser_for_dataset(dataset_name)
+        parser = parser_class(original_dataset_path)
+        files_dict = parser.run_parser()
+        files_dict = dict(sorted(files_dict.items()))
+    else: 
+        files_dict = {}
+        for root, _, files in os.walk(original_dataset_path):
+            for file in files:
+                if file.endswith(".wav"):
+                    file_path = os.path.join(root, file)
+                    files_dict[file_path] = None
 
     # Check if the corrupted dataset already exists
     if os.path.exists(corrupted_dataset_path):
@@ -89,7 +97,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     robuser_metadata = {}
 
     # Corrupt the dataset
-    for file_path in tqdm(annotated_files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"):
+    for file_path in tqdm(files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"):
         if corruption_type == 'compression':
             _, sr = librosa.load(file_path, sr=None)
 
@@ -186,7 +194,11 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
 
     corruptions_list = parse_config(corruptions_config)
     for corruption_type, corruption_config in tqdm(corruptions_list, desc="Corrupting datasets"):
-        corrupted_dataset_path = os.path.join(corrupted_datasets_path,
+        if dataset_name is None:
+            corrupted_dataset_path = os.path.join(corrupted_datasets_path,
+                                              f"{get_corruption_str(corruption_type, corruption_config)}")
+        else:
+            corrupted_dataset_path = os.path.join(corrupted_datasets_path,
                                               f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
         try:
             corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
@@ -211,7 +223,7 @@ def parse_arguments():
                              help="Force overwrite the corrupted dataset if it already exists")
     args_parser.add_argument('-s', '--skip_copy', action="store_true",
                              help="Skip copying the original dataset to the corrupted dataset path and only generate the corrupted wav files.")
-    args_parser.add_argument('-d', '--dataset', required=True,
+    args_parser.add_argument('-d', '--dataset', required=False,
                              help="Name of the dataset (e.g. iemocap)")
     args_parser.add_argument('-c', '--config', type=str, default="config.yml",
                              help="Path to the YAML configuration for the corruptions")
