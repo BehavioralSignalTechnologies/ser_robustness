@@ -42,7 +42,7 @@ Currently, **ROBUSER** supports the:
 2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
-usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] -d DATASET [-c CONFIG]
+usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] [-d DATASET] [-c CONFIG]
 
 Corrupt the dataset
 
@@ -64,6 +64,14 @@ optional arguments:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
+```
+
+🚨 You can use the script to corrupt any directory, by not providing a specific dataset with the `-d` flag.
+
+- Example:
+
+```
+python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
 ```
 
 ## 📊 Evaluating the model predictions
