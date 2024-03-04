@@ -5,7 +5,7 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 ## 💁 Installation guidelines
 
 
-- Install & activate poetry (used for managing dependencies)
+- Install & activate poetry *(used for managing dependencies)*
 
 ```
 pip3 install poetry
@@ -22,9 +22,27 @@ sudo apt install ffmpeg libasound2-dev
 > The dependencies have been installed 👏
 
 
+# 🚀 Code Structure
+
+- `src/parsing`: contains the code for parsing the datasets.
+- `src/evaluation`: contains the code for evaluating the model predictions.
+- `src/noise_generation`: contains the scripts for adding
+
+## 📰 Documentation
+
+For detailed documentation, please refer to:
+-  Supported [Corruption types](./docs/corruption_types.md)
+- [Configuration](./docs/configuration.md) parameters for the corruptions
+
+## 📑 Supported Datasets
+
+Currently, **ROBUSER** supports the `IEMOCAP` dataset – [Download dataset](https://sail.usc.edu/iemocap/iemocap_release.htm)
+
+
 ## 📈 Usage
 
-Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. 
+1. Modify the `config.yaml` to specify the corruption types and levels.
+2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] -d DATASET [-c CONFIG]
@@ -50,19 +68,3 @@ optional arguments:
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
-
-# 🚀 Code Structure
-
-- `src/parsing`: contains the code for parsing the datasets.
-- `src/evaluation`: contains the code for evaluating the model predictions.
-- `src/noise_generation`: contains the scripts for adding
-
-## 📰 Documentation
-
-For detailed documentation, please refer to:
--  [Corruption types](./docs/corruption_types.md), which outlines the supported types of corruptions.
-- [Configuration](./docs/configuration.md), which analyzes the configuration parameters.
-
-## 📑 Supported Datasets
-
-Currently, only the `IEMOCAP` dataset is supported. [Download dataset](https://sail.usc.edu/iemocap/iemocap_release.htm)
