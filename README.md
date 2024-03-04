@@ -22,7 +22,7 @@ sudo apt install ffmpeg libasound2-dev
 > The dependencies have been installed 👏
 
 
-## 📈 Usage
+## 📈 Generating the corrupted datasets
 
 Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. 
 
@@ -45,10 +45,43 @@ optional arguments:
                         Path to the YAML configuration for the corruptions
 ```
 
-- Example for IEMOCAP:
+Example for IEMOCAP:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
+```
+
+## 📊 Evaluating the model predictions
+
+We provide scripts to evaluate your model predictions on the supported datasets.
+After you train your model, export the predictions to a CSV file with the following format:
+
+```
+filename,prediction
+Ses01F_impro01_F000.wav,neutral
+...
+```
+
+Then you can run the `evaluate.py` script:
+```
+usage: evaluate.py [-h] -csv PREDICTIONS -p DATA_PATH -d {iemocap}
+
+Evaluate the model on the test set
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -csv PREDICTIONS, --predictions PREDICTIONS
+                        Path to the predictions CSV file
+  -p DATA_PATH, --data_path DATA_PATH
+                        Path to the dataset
+  -d {iemocap}, --dataset {iemocap}
+                        Name of the dataset
+```
+
+Example for IEMOCAP:
+
+```
+python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
 
 # 🚀 Code Structure

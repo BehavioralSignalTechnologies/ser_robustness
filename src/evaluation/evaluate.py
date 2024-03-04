@@ -90,8 +90,8 @@ def evaluate_iemocap(preds, targets):
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate the model on the test set")
     parser.add_argument("-csv", "--predictions", type=str, required=True, help="Path to the predictions CSV file")
-    parser.add_argument("-p", "--data_path", type=str, required=True, help="Path to the dataset path")
-    parser.add_argument("-d", "--dataset", type=str, choices=["iemocap"], required=True, help="Dataset to evaluate")
+    parser.add_argument("-p", "--data_path", type=str, required=True, help="Path to the dataset")
+    parser.add_argument("-d", "--dataset", type=str, choices=["iemocap"], required=True, help="Name of the dataset")
     args = parser.parse_args()
     return args
 
