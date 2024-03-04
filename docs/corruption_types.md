@@ -52,9 +52,9 @@ Configure the `impulse_response` section in the `config.yml` file to apply impul
 - [**EchoThief Impulse Response Library**](http://www.echothief.com/wp-content/uploads/2016/06/EchoThiefImpulseResponseLibrary.zip)
 
 ### Default RT60 range values:
-- 0.1-0.5
-- 0.5-1.5
-- 1.5-5.0
+- 0.1-0.5 seconds
+- 0.5-1.0 seconds
+- 1.0-1.5 seconds
 
 ## Clipping Distortion 📶
 

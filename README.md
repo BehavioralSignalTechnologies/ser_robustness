@@ -5,7 +5,7 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 ## 💁 Installation guidelines
 
 
-- Install & activate poetry *(used for managing dependencies)*
+- Install & activate poetry **(used for managing dependencies)**
 
 ```
 pip3 install poetry
@@ -22,12 +22,6 @@ sudo apt install ffmpeg libasound2-dev
 > The dependencies have been installed 👏
 
 
-# 🚀 Code Structure
-
-- `src/parsing`: contains the code for parsing the datasets.
-- `src/evaluation`: contains the code for evaluating the model predictions.
-- `src/noise_generation`: contains the scripts for adding
-
 ## 📰 Documentation
 
 For detailed documentation, please refer to:
@@ -36,12 +30,17 @@ For detailed documentation, please refer to:
 
 ## 📑 Supported Datasets
 
-Currently, **ROBUSER** supports the `IEMOCAP` dataset – [Download dataset](https://sail.usc.edu/iemocap/iemocap_release.htm)
+Currently, **ROBUSER** supports the:
+- [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm) dataset.
+
+> More datasets will be added soon.
 
 
 ## 📈 Usage
 
 1. Modify the `config.yaml` to specify the corruption types and levels.
+2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
+1. Modify the `config.yml` to specify the corruption types and levels.
 2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
@@ -69,4 +68,40 @@ optional arguments:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-You can also find multiple corruption [examples](./docs/examples.md) of the same audio file.
+## 📊 Evaluating the model predictions
+
+We provide scripts to evaluate your model predictions on the supported datasets.
+After you train your model, export the predictions to a CSV file with the following format:
+
+```
+filename,prediction
+Ses01F_impro01_F000.wav,neutral
+...
+```
+
+Then you can run the `evaluate.py` script:
+```
+usage: evaluate.py [-h] -csv PREDICTIONS -p DATA_PATH -d {iemocap}
+
+Evaluate the model on the test set
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -csv PREDICTIONS, --predictions PREDICTIONS
+                        Path to the predictions CSV file
+  -p DATA_PATH, --data_path DATA_PATH
+                        Path to the dataset
+  -d {iemocap}, --dataset {iemocap}
+                        Name of the dataset
+```
+
+Example for IEMOCAP:
+
+```
+python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
+```
+
+## 📝 How to contribute
+
+If you want to add support for a new dataset, please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+Note that although this project is focused on SER, it can be used for any speech dataset/task such as speech recognition, speaker recognition, etc.
