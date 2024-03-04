@@ -68,3 +68,5 @@ optional arguments:
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
+
+You can also find multiple corruption [examples](./docs/examples.md) of the same audio file.
