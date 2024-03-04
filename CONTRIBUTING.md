@@ -25,7 +25,7 @@ You can refer to the `ParserForIEMOCAP` class for an example of how to implement
 
 In the `src/parsing/get_parser.py` file, add an entry for the new parser in the `get_parser` function.
 At this point, you should be able to use the `corrupt_dataset.py` script to add noise to the new dataset.
-Because this script copies the dataset in the exact same structure as the original dataset, your evaluation code should work out of the box.
+Because this script copies the dataset in the exact same structure as the original dataset, your code should work out of the box.
 
 ## (Optional) Step 3: Add evaluation support
 
