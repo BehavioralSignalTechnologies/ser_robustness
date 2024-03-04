@@ -5,7 +5,7 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 ## 💁 Installation guidelines
 
 
-- Install & activate poetry (used for managing dependencies)
+- Install & activate poetry *(used for managing dependencies)*
 
 ```
 pip3 install poetry
@@ -22,9 +22,24 @@ sudo apt install ffmpeg libasound2-dev
 > The dependencies have been installed 👏
 
 
-## 📈 Generating the corrupted datasets
+## 📰 Documentation
 
-Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corrupt_dataset.py` script. 
+For detailed documentation, please refer to:
+-  Supported [Corruption types](./docs/corruption_types.md)
+- [Configuration](./docs/configuration.md) parameters for the corruptions
+
+## 📑 Supported Datasets
+
+Currently, **ROBUSER** supports the:
+- [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm) dataset.
+
+> More datasets will be added soon.
+
+
+## 📈 Usage
+
+1. Modify the `config.yaml` to specify the corruption types and levels.
+2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] -d DATASET [-c CONFIG]
@@ -45,7 +60,7 @@ optional arguments:
                         Path to the YAML configuration for the corruptions
 ```
 
-Example for IEMOCAP:
+- Example for IEMOCAP:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
@@ -84,21 +99,7 @@ Example for IEMOCAP:
 python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
 
-## 📰 Documentation
-
-For detailed documentation, please refer to:
--  [Corruption types](./docs/corruption_types.md), which outlines the supported types of corruptions.
-- [Configuration](./docs/configuration.md), which analyzes the configuration parameters.
-
-## 📑 Supported Datasets
-
-List of supported datasets (only IEMOCAP is supported for now):
-- [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm)
-- (More datasets will be added soon!)
+## 📝 How to contribute
 
 If you want to add support for a new dataset, please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 Note that although this project is focused on SER, it can be used for any speech dataset/task such as speech recognition, speaker recognition, etc.
-
-## 📝 How to contribute
-
-Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on how to contribute to the project.
