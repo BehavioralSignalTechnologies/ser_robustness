@@ -28,10 +28,13 @@ def parse_csv(preds_csv):
 
 def evaluate_iemocap(preds, targets):
     """
-    Evaluate the model on the test set
+    Evaluate the model on IEMOCAP by performing 10-fold cross-validation
     Args:
         preds: Predictions from the model as dictionary of {file_name: {"emotion": emotion}}
-        targets: True labels: dictionary of {file_name: {"emotion": emotion, "fold": fold}}
+        targets: True labels: dictionary of {file_name: {"emotion": emotion, "fold": fold, "speaker_id": speaker_id}}
+    Returns:
+        Dictionary of {fold: [weighted_accuracy, unweighted_accuracy]}
+        List of [average_weighted_accuracy, average_unweighted_accuracy]
     """
 
     # Check that the classes are valid
@@ -59,26 +62,29 @@ def evaluate_iemocap(preds, targets):
     if len(preds) != len(targets):
         raise ValueError(f"Predictions and targets have different lengths: {len(preds)} and {len(targets)}")
 
-    # Evaluate with 5-fold cross-validation
-    sessions = set([target["fold"] for target in targets.values()])
+    # Evaluate with 10-fold cross-validation
+    folds = set([target["speaker_id"] for target in targets.values()])
+    if len(folds) != 10:
+        raise ValueError(f"Expected 10 folds, but got {len(folds)}")
+
     results = {}
-    for session in sorted(sessions):
-        fold_filenames = [key for key, value in targets.items() if value["fold"] == session]
+    for fold in sorted(folds):
+        fold_filenames = [key for key, value in targets.items() if value["speaker_id"] == fold]
 
         fold_preds = [preds[key]["emotion"] for key in fold_filenames]
         fold_targets = [targets[key]["emotion"] for key in fold_filenames]
 
-        # Calculate the weighted accuracy
-        weighted_accuracy = accuracy_score(fold_targets, fold_preds)
+        # Calculate the WA
+        wa = accuracy_score(fold_targets, fold_preds)
 
-        # Calculate the unweighted accuracy (macro averaged recall)
-        unweighted_accuracy = recall_score(fold_targets, fold_preds, average="macro")
+        # Calculate the UA (macro averaged recall)
+        ua = recall_score(fold_targets, fold_preds, average="macro")
 
-        results[session] = [weighted_accuracy, unweighted_accuracy]
+        results[fold] = [wa, ua]
 
-    results["average"] = [sum([result[0] for result in results.values()]) / len(results),
-                          sum([result[1] for result in results.values()]) / len(results)]
-    return results
+    avg_results = [sum([result[0] for result in results.values()]) / len(results),
+                   sum([result[1] for result in results.values()]) / len(results)]
+    return results, avg_results
 
 
 def parse_args():
@@ -95,15 +101,20 @@ if __name__ == "__main__":
 
     preds = parse_csv(args.predictions)
     parser_class = get_parser_for_dataset(args.dataset)
+    print(f"Evaluating the predictions {args.predictions} on the {args.dataset} dataset at {args.data_path}")
     if args.dataset == "iemocap":
         parser = parser_class(args.data_path)
         targets = parser.run_parser()
         targets = {os.path.basename(k): v for k, v in targets.items()}
-        results = evaluate_iemocap(preds, targets)
-        print(f"Weighted accuracy: {results['average'][0]:.2f}")
-        print(f"Unweighted accuracy: {results['average'][1]:.2f}")
-        for session, (weighted_accuracy, unweighted_accuracy) in results.items():
-            print(f"Session {session}: Weighted accuracy: {weighted_accuracy:.2f}, "
-                  f"Unweighted accuracy: {unweighted_accuracy:.2f}")
+        results, avg_results = evaluate_iemocap(preds, targets)
+
+        print("-" * 50)
+        print("Per-fold results:")
+        for fold, (wa, ua) in results.items():
+            print(f"Fold {fold}: WA: {wa:.2f}, "
+                  f"UA: {ua:.2f}")
+        print("-" * 50)
+        print(f"Average results: WA: {avg_results[0]:.2f}, "
+              f"UA: {avg_results[1]:.2f}")
     else:
         raise ValueError(f"Invalid dataset: {args.dataset}")
