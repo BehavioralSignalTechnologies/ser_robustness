@@ -24,7 +24,7 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📈 Generating the corrupted datasets
 
-Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corruption_dataset.py` script. 
+Modify the `config.yaml` file to enable/disable the corruption types and specify the corruption levels you want to evaluate. Then you can run the `corrupt_dataset.py` script. 
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] -d DATASET [-c CONFIG]
