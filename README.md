@@ -84,12 +84,6 @@ Example for IEMOCAP:
 python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
 
-# 🚀 Code Structure
-
-- `src/parsing`: contains the code for parsing the datasets.
-- `src/evaluation`: contains the code for evaluating the model predictions.
-- `src/noise_generation`: contains the scripts for adding
-
 ## 📰 Documentation
 
 For detailed documentation, please refer to:
@@ -98,4 +92,13 @@ For detailed documentation, please refer to:
 
 ## 📑 Supported Datasets
 
-Currently, only the `IEMOCAP` dataset is supported. [Download dataset](https://sail.usc.edu/iemocap/iemocap_release.htm)
+List of supported datasets (only IEMOCAP is supported for now):
+- [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm)
+- (More datasets will be added soon!)
+
+If you want to add support for a new dataset, please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+Note that although this project is focused on SER, it can be used for any speech dataset/task such as speech recognition, speaker recognition, etc.
+
+## 📝 How to contribute
+
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on how to contribute to the project.
