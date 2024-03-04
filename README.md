@@ -38,7 +38,7 @@ Currently, **ROBUSER** supports the:
 
 ## 📈 Usage
 
-1. Modify the `config.yaml` to specify the corruption types and levels.
+1. Modify the `config.yml` to specify the corruption types and levels.
 2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
