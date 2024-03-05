@@ -40,7 +40,7 @@ Currently, **ROBUSER** supports the:
 
 ## 📈 Usage
 
-1. Modify the `config.yaml` to specify the corruption types and levels.
+1. Modify the `config.yml` to specify the corruption types and levels.
 2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
@@ -62,18 +62,15 @@ optional arguments:
                         Path to the YAML configuration for the corruptions
 ```
 
-- Example for IEMOCAP:
+Example for IEMOCAP:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-We have also created the [examples.ipynb](src/noise_generation/examples.ipynb) notebook, in which we have used the different types of corruptions provided in this notebook, to produce the corrupted versions of the same audio file. To listen to each corrupted audio, you can download the [examples.html](src/noise_generation/examples.html) file.
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different corruptions of the same audio file.
 
-🚨 You can use the script to corrupt any directory (without any labels), 
-by not providing a specific dataset with the `-d` flag.
-
-- Example:
+🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with the `-d` flag. Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
