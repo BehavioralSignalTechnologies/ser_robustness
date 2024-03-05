@@ -24,7 +24,9 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📰 Documentation
 
-For detailed documentation, please refer to:
+Before running the dataset corruption scripts you first need to download the 
+required noise datasets and configure the respective parameters. For detailed 
+documentation on how to do this, please refer to:
 -  Supported [Corruption types](./docs/corruption_types.md)
 - [Configuration](./docs/configuration.md) parameters for the corruptions
 
@@ -66,7 +68,8 @@ optional arguments:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-🚨 You can use the script to corrupt any directory, by not providing a specific dataset with the `-d` flag.
+🚨 You can use the script to corrupt any directory (without any labels), 
+by not providing a specific dataset with the `-d` flag.
 
 - Example:
 
@@ -76,7 +79,8 @@ python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_pat
 
 ## 📊 Evaluating the model predictions
 
-We provide scripts to evaluate your model predictions on the supported datasets.
+For the supported annotated datasets, we also provide scripts to evaluate your model 
+predictions.
 After you train your model, export the predictions to a CSV file with the following format:
 
 ```
