@@ -37,19 +37,10 @@ def evaluate_iemocap(preds, targets):
         List of [average_weighted_accuracy, average_unweighted_accuracy]
     """
 
-    # Check that the classes are valid
+    # Only keep the expected classes
     expected_classes = {"neutral", "happy", "sad", "angry"}
-    pred_classes = set([pred["emotion"] for pred in preds.values()])
-    target_classes = set([target["emotion"] for target in targets.values()])
-
-    if pred_classes - expected_classes != set():
-        raise ValueError(f"Predictions contain invalid classes: {pred_classes}")
-    if pred_classes - expected_classes != set():
-        raise ValueError(f"Targets contain invalid classes: {target_classes}")
-
-    # Remove "other" emotion from the predictions and targets
-    preds = {key: value for key, value in preds.items() if value["emotion"] != "other"}
-    targets = {key: value for key, value in targets.items() if value["emotion"] != "other"}
+    preds = {key: value for key, value in preds.items() if value["emotion"] in expected_classes}
+    targets = {key: value for key, value in targets.items() if value["emotion"] in expected_classes}
 
     # Remove prediction keys that are not in the targets
     preds = {key: value for key, value in preds.items() if key in targets}
