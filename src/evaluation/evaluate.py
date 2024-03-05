@@ -1,7 +1,9 @@
+import argparse
 import os
 import sys
-import argparse
+
 from sklearn.metrics import accuracy_score, recall_score
+from sklearn.metrics import confusion_matrix
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -26,6 +28,38 @@ def parse_csv(preds_csv):
     return preds
 
 
+def calc_metrics_from_cm(confusion_matrix):
+    metrics = {
+        "recall": [],
+        "weighted_recall": [],
+        "f1_score": [],
+    }
+    TPs = []
+    instances_per_class = []
+    for i in range(len(confusion_matrix)):
+        TP = confusion_matrix[i][i]
+        FN = sum(confusion_matrix[i]) - TP  # Sum the row except for TP to get FN
+        FP = sum(confusion_matrix[j][i] for j in range(len(confusion_matrix)) if j != i)
+
+        precision = TP / (TP + FP) if (TP + FP) != 0 else 0.0
+        recall = TP / (TP + FN) if (TP + FN) != 0 else 0.0
+        # accuracy = TP / sum(confusion_matrix[i]) if sum(confusion_matrix[i]) != 0 else 0.0
+        f1 = (
+            2 * (precision * recall) / (precision + recall)
+            if (precision + recall) != 0
+            else 0.0
+        )
+        TPs.append(TP)
+        instances_per_class.append(sum(confusion_matrix[i]))
+        metrics["recall"].append(recall)
+        metrics["f1_score"].append(f1)
+    metrics["weighted_accuracy"] = sum(TPs) / sum(instances_per_class)
+    metrics["unweighted_accuracy"] = sum(metrics["recall"]) / len(metrics["recall"])
+    metrics["macro_f1_score"] = sum(metrics["f1_score"]) / len(metrics["f1_score"])
+
+    return metrics
+
+
 def evaluate_iemocap(preds, targets):
     """
     Evaluate the model on IEMOCAP by performing 10-fold cross-validation
@@ -34,7 +68,7 @@ def evaluate_iemocap(preds, targets):
         targets: True labels: dictionary of {file_name: {"emotion": emotion, "fold": fold, "speaker_id": speaker_id}}
     Returns:
         Dictionary of {fold: [weighted_accuracy, unweighted_accuracy]}
-        List of [average_weighted_accuracy, average_unweighted_accuracy]
+        List of [overal_wa, overall_ua]
     """
 
     # Only keep the expected classes
@@ -55,8 +89,6 @@ def evaluate_iemocap(preds, targets):
 
     # Evaluate with 10-fold cross-validation
     folds = set([target["speaker_id"] for target in targets.values()])
-    if len(folds) != 10:
-        raise ValueError(f"Expected 10 folds, but got {len(folds)}")
 
     results = {}
     for fold in sorted(folds):
@@ -66,16 +98,23 @@ def evaluate_iemocap(preds, targets):
         fold_targets = [targets[key]["emotion"] for key in fold_filenames]
 
         # Calculate the WA
-        wa = accuracy_score(fold_targets, fold_preds)
+        wa = accuracy_score(fold_targets, fold_preds) * 100
 
         # Calculate the UA (macro averaged recall)
-        ua = recall_score(fold_targets, fold_preds, average="macro")
+        ua = recall_score(fold_targets, fold_preds, average="macro") * 100
 
         results[fold] = [wa, ua]
 
-    avg_results = [sum([result[0] for result in results.values()]) / len(results),
-                   sum([result[1] for result in results.values()]) / len(results)]
-    return results, avg_results
+    all_filenames = list(targets.keys())
+    all_preds = [preds[key]["emotion"] for key in all_filenames]
+    all_targets = [targets[key]["emotion"] for key in all_filenames]
+
+    cm = confusion_matrix(all_targets, all_preds)
+    overall_metrics = calc_metrics_from_cm(cm)
+    overall_wa = overall_metrics["weighted_accuracy"] * 100
+    overall_ua = overall_metrics["unweighted_accuracy"] * 100
+
+    return results, [overall_wa, overall_ua]
 
 
 def parse_args():
@@ -97,15 +136,15 @@ if __name__ == "__main__":
         parser = parser_class(args.data_path)
         targets = parser.run_parser()
         targets = {os.path.basename(k): v for k, v in targets.items()}
-        results, avg_results = evaluate_iemocap(preds, targets)
+        results, overall_results = evaluate_iemocap(preds, targets)
 
         print("-" * 50)
         print("Per-fold results:")
         for fold, (wa, ua) in results.items():
-            print(f"Fold {fold}: WA: {wa:.2f}, "
-                  f"UA: {ua:.2f}")
+            print(f"Fold {fold}: WA: {wa:.2f}%, "
+                  f"UA: {ua:.2f}%")
         print("-" * 50)
-        print(f"Average results: WA: {avg_results[0]:.2f}, "
-              f"UA: {avg_results[1]:.2f}")
+        print(f"Overall results: WA: {overall_results[0]:.2f}%, "
+              f"UA: {overall_results[1]:.2f}%")
     else:
         raise ValueError(f"Invalid dataset: {args.dataset}")
