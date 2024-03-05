@@ -66,6 +66,8 @@ optional arguments:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
+We have also created the [examples.ipynb](src/noise_generation/examples.ipynb) notebook, in which we have used the different types of corruptions provided in this notebook, to produce the corrupted versions of the same audio file. To listen to each corrupted audio, you can download the [examples.html](src/noise_generation/examples.html) file.
+
 ## 📊 Evaluating the model predictions
 
 We provide scripts to evaluate your model predictions on the supported datasets.
