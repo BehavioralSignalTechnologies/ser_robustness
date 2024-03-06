@@ -20,6 +20,7 @@ pyroomacoustics = "^0.7.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+ipykernel = "^6.29.3"
 
 [build-system]
 requires = ["poetry-core"]

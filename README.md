@@ -62,16 +62,15 @@ optional arguments:
                         Path to the YAML configuration for the corruptions
 ```
 
-- Example for IEMOCAP:
+Example for IEMOCAP:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-🚨 You can use the script to corrupt any directory (without any labels), 
-by not providing a specific dataset with the `-d` flag.
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different corruptions of the same audio file.
 
-- Example:
+🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with the `-d` flag. Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
