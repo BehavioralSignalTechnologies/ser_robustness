@@ -11,9 +11,9 @@ content:
 gaussian:
   enabled: true
   snr:
-    - 0
     - 10
     - 20
+    - 30
 gain_transition:
   enabled: true
   min_max_gain_db: 
