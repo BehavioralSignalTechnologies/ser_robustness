@@ -33,14 +33,14 @@ python3
 - 10dB
 - 20dB
 
-## GaussianSNR Noise 💨
+## Gaussian Noise 💨
 
 Add White Gaussian Noise to the clean dataset with different Signal-to-Noise Ratio (SNR) levels. Configure the `gaussian` section in the `config.yml` file to add Gaussian noise to the clean dataset.
 
 ### Default SNR values:
-- 0dB
 - 10dB
 - 20dB
+- 30dB
 
 ## Impulse Response Effects 🚇
 
