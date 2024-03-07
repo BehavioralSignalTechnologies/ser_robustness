@@ -24,7 +24,9 @@ sudo apt install ffmpeg libasound2-dev
 
 ## 📰 Documentation
 
-For detailed documentation, please refer to:
+Before running the dataset corruption scripts you first need to download the 
+required noise datasets and configure the respective parameters. For detailed 
+documentation on how to do this, please refer to:
 -  Supported [Corruption types](./docs/corruption_types.md)
 - [Configuration](./docs/configuration.md) parameters for the corruptions
 
@@ -42,7 +44,7 @@ Currently, **ROBUSER** supports the:
 2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
 
 ```
-usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] -d DATASET [-c CONFIG]
+usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] [-d DATASET] [-c CONFIG]
 
 Corrupt the dataset
 
@@ -60,15 +62,24 @@ optional arguments:
                         Path to the YAML configuration for the corruptions
 ```
 
-- Example for IEMOCAP:
+Example for IEMOCAP:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different corruptions of the same audio file.
+
+🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with the `-d` flag. Example:
+
+```
+python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
+```
+
 ## 📊 Evaluating the model predictions
 
-We provide scripts to evaluate your model predictions on the supported datasets.
+For the supported annotated datasets, we also provide scripts to evaluate your model 
+predictions.
 After you train your model, export the predictions to a CSV file with the following format:
 
 ```
