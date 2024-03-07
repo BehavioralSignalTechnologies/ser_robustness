@@ -1,9 +1,8 @@
 # 💪 ROBUSER
+
 A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER) 💬
 
-
 ## 💁 Installation guidelines
-
 
 - Install & activate poetry *(used for managing dependencies)*
 
@@ -21,27 +20,27 @@ sudo apt install ffmpeg libasound2-dev
 
 > The dependencies have been installed 👏
 
-
 ## 📰 Documentation
 
-Before running the dataset corruption scripts you first need to download the 
-required noise datasets and configure the respective parameters. For detailed 
+Before running the dataset corruption scripts you first need to download the
+required noise datasets and configure the respective parameters. For detailed
 documentation on how to do this, please refer to:
--  Supported [Corruption types](./docs/corruption_types.md)
+
+- Supported [Corruption types](./docs/corruption_types.md)
 - [Configuration](./docs/configuration.md) parameters for the corruptions
 
 ## 📑 Supported Datasets
 
 Currently, **ROBUSER** supports the:
+
 - [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm) dataset.
 
 > More datasets will be added soon.
 
-
 ## 📈 Usage
 
 1. Modify the `config.yml` to specify the corruption types and levels.
-2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory. 
+2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory.
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] [-d DATASET] [-c CONFIG]
@@ -68,17 +67,25 @@ Example for IEMOCAP:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different corruptions of the same audio file.
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different
+corruptions of the same audio file.
 
-🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with the `-d` flag. Example:
+🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with
+the `-d` flag. Example:
 
 ```
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
 ```
 
+The corrupted dataset will be saved in the specified output path.
+The `robuser_config.yaml` file, with the corruption configuration, will be generated in the
+directory's root. Additionally, for certain types of corruptions, the `robuser_metadata.csv` file will also be created.
+This CSV file contains information about the applied corruptions for each original utterance, including, for instance, the specific noise file
+used for background noise corruption or the impulse response file used for impulse response corruption.
+
 ## 📊 Evaluating the model predictions
 
-For the supported annotated datasets, we also provide scripts to evaluate your model 
+For the supported annotated datasets, we also provide scripts to evaluate your model
 predictions.
 After you train your model, export the predictions to a CSV file with the following format:
 
@@ -89,6 +96,7 @@ Ses01F_impro01_F000.wav,neutral
 ```
 
 Then you can run the `evaluate.py` script:
+
 ```
 usage: evaluate.py [-h] -csv PREDICTIONS -p DATA_PATH -d {iemocap}
 
@@ -113,4 +121,5 @@ python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d 
 ## 📝 How to contribute
 
 If you want to add support for a new dataset, please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
-Note that although this project is focused on SER, it can be used for any speech dataset/task such as speech recognition, speaker recognition, etc.
+Note that although this project is focused on SER, it can be used for any speech dataset/task such as speech
+recognition, speaker recognition, etc.
