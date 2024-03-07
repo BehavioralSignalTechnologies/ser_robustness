@@ -77,9 +77,9 @@ the `-d` flag. Example:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
 ```
 
-The corrupted dataset will be saved in the specified output path.
+The corrupted datasets will be saved in the specified output path.
 The `robuser_config.yaml` file, with the corruption configuration, will be generated in the
-directory's root. Additionally, for certain types of corruptions, the `robuser_metadata.csv` file will also be created.
+corrupted dataset's root. Additionally, for certain types of corruptions, the `robuser_metadata.csv` file will also be created.
 This CSV file contains information about the applied corruptions for each original utterance, including, for instance, the specific noise file
 used for background noise corruption or the impulse response file used for impulse response corruption.
 
