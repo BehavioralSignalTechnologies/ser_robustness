@@ -9,6 +9,10 @@
 import os
 import string
 import argparse
+import librosa
+import soundfile as sf
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
 from parsing.parser import Parser
 
@@ -34,6 +38,26 @@ class ParserForIEMOCAP(Parser):
                                 "angry", "hap": "happy", "exc": "happy",
                                 "fru": "frustrated"}
         self.gender_mapping = {"F": "female", "M": "male"}
+        self.target_sr = 16000
+    
+
+    def resample_audio(self, file_path):
+        y, sr = librosa.load(file_path, sr=None)
+        if sr != self.target_sr:
+            y = librosa.resample(y, orig_sr=sr, target_sr=self.target_sr)
+            sf.write(file_path, y, self.target_sr)
+
+    def resample_iemocap(self, session):
+        with ThreadPoolExecutor() as executor:
+            files_to_resample = []
+            for root, _, files in os.walk(self.wav_files_path % session):
+                for file in files:
+                    if file.endswith(".wav"):
+                        files_to_resample.append(os.path.join(root, file))
+
+            list(tqdm(executor.map(self.resample_audio, files_to_resample), total=len(files_to_resample),
+                      desc=f"Resampling IEMOCAP Session {session} to {self.target_sr}Hz"))
+
 
     def get_utterances_per_dialog(self, session):
         """!
@@ -212,6 +236,8 @@ class ParserForIEMOCAP(Parser):
         return speaker_id, gender, channel
 
     def run_parser(self):
+        for session in tqdm(self.sessions, desc="Processing IEMOCAP Sessions"):
+            self.resample_iemocap(session)
         annotations = self.get_annotations()
         annotated_utterances = \
             self.convert_annotations_in_audio_hierarchy(annotations)
