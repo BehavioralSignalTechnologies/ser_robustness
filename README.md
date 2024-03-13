@@ -31,7 +31,7 @@ documentation on how to do this, please refer to:
 
 ## 📑 Supported Datasets
 
-Currently, **ROBUSER** supports the:
+Currently, **RobuSER** supports the:
 
 - [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm) dataset.
 
