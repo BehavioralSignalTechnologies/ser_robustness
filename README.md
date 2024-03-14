@@ -31,7 +31,7 @@ documentation on how to do this, please refer to:
 
 ## 📑 Supported Datasets
 
-Currently, **ROBUSER** supports the:
+Currently, **RobuSER** supports the:
 
 - [IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm) dataset.
 
@@ -67,8 +67,7 @@ Example for IEMOCAP:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to the different
-corruptions of the same audio file.
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to corrupted versions of 4 different (neutral, happy, sad, and angry) utterances.
 
 🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with
 the `-d` flag. Example:
