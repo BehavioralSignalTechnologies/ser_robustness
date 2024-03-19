@@ -2,7 +2,6 @@
 name = "noise-process"
 version = "0.0.1"
 description = "Add background and signal noise to audio files"
-authors = ["behavioral signals"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
