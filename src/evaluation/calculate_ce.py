@@ -69,7 +69,13 @@ def main():
         rce = relative_corruption_error(baseline_errors, model_errors, model_clean_error, baseline_clean_error)
         rces[corruption_type] = round(rce, 2)
 
-    print(tabulate.tabulate(ces.items(), headers=["Corruption Type", "CE %"]))
+    # ces and rces in the same table
+    table = []
+    for corruption_type in corruption_types:
+        table.append([corruption_type, ces[corruption_type], rces[corruption_type]])
+
+    print(tabulate.tabulate(table, headers=["Corruption Type", "CE %", "RCE %"]))
+
     print("---")
     print(f"Mean Corruption Error (mCE) %: {np.mean(list(ces.values())):.2f}")
     print(f"Relative mCE %: {np.mean(list(rces.values())):.2f}")
