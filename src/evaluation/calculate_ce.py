@@ -20,14 +20,14 @@ def corruption_error(baseline_errors, model_errors):
     return ce
 
 
-def relative_corruption_error(baseline_errors, model_errors, model_clean_error, baseline_clean_error):
+def relative_corruption_error(baseline_errors, baseline_clean_error, model_errors, model_clean_error):
     """
     Calculate the Relative Corruption Error Eq. 3 from the paper for a specific corruption type.
     Args:
         baseline_errors: np.array of baseline error rates
+        baseline_clean_error: error rate of the baseline on clean data
         model_errors: np.array of model error rates
         model_clean_error: error rate of the model on clean data
-        baseline_clean_error: error rate of the baseline on clean data
     Returns:
         Relative corruption error
     """
@@ -66,7 +66,7 @@ def main():
             [baseline_metrics[corruption_type][key] for key in baseline_metrics[corruption_type]])
         ce = corruption_error(baseline_errors, model_errors)
         ces[corruption_type] = round(ce, 2)
-        rce = relative_corruption_error(baseline_errors, model_errors, model_clean_error, baseline_clean_error)
+        rce = relative_corruption_error(baseline_errors, baseline_clean_error, model_errors, model_clean_error)
         rces[corruption_type] = round(rce, 2)
 
     # ces and rces in the same table
