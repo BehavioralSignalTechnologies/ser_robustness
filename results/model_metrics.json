@@ -1,0 +1,43 @@
+{
+  "clean": ...,
+  "content_esc50": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "content_musan": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "content_speech_urbansound8k": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "gaussian": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "gain_transition": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "clipping_distortion": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "impulse_response": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  },
+  "compression": {
+    "level_1": ...,
+    "level_2": ...,
+    "level_3": ...
+  }
+}
