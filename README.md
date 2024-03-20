@@ -124,17 +124,17 @@ python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d 
 
 After you've evaluated your model on the corrupted datasets, you can calculate the Corruption Error (CE) and Relative
 Corruption Error metrics.
-Fill the `model_metrics.json` file with the error rates of your model on the clean and corrupted datasets, and then run
+Fill the `results/model_metrics.json` file with the error rates of your model on the clean and corrupted datasets, and then run
 the `calculate_ce.py` script:
 
 ```
-python3 src/evaluation/calculate_ce.py -b <baseline_metrics.json> -i <your_model_metrics.json>
+python3 src/evaluation/calculate_ce.py -b <baseline_metrics.json> -i results/model_metrics.json
 ```
 
 Example for IEMOCAP:
 
 ```
-python3 src/evaluation/calculate_ce.py -b results/iemocap.json -i model_metrics.json
+python3 src/evaluation/calculate_ce.py -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
 ```
 
 The script will output the CE and relative CE metrics as defined in the section _Robustness evaluation_ of the paper.
