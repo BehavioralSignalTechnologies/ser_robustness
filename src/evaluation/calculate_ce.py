@@ -39,9 +39,9 @@ def relative_corruption_error(baseline_errors, model_errors, model_clean_error, 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate the model on the test set")
     parser.add_argument("-i", "--model_metrics", type=str, required=True,
-                        help="Path to the model metrics json file")
+                        help="Path to the model metrics json file with the error rates")
     parser.add_argument("-b", "--baseline_metrics", type=str, required=True,
-                        help="Path to the baseline metrics json file")
+                        help="Path to the baseline metrics json file with the error rates")
     args = parser.parse_args()
     return args
 
