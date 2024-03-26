@@ -1,0 +1,43 @@
+{
+  "clean": 21.64,
+  "content_esc50": {
+    "level_1": 23.85,
+    "level_2": 26.83,
+    "level_3": 37.14
+  },
+  "content_musan": {
+    "level_1": 23.49,
+    "level_2": 28.33,
+    "level_3": 41.96
+  },
+  "content_speech_urbansound8k": {
+    "level_1": 23.05,
+    "level_2": 27.07,
+    "level_3": 39.54
+  },
+  "gaussian": {
+    "level_1": 24.70,
+    "level_2": 28.57,
+    "level_3": 39.81
+  },
+  "gain_transition": {
+    "level_1": 22.15,
+    "level_2": 22.44,
+    "level_3": 24.82
+  },
+  "clipping_distortion": {
+    "level_1": 25.20,
+    "level_2": 31.77,
+    "level_3": 39.74
+  },
+  "impulse_response": {
+    "level_1": 31.35,
+    "level_2": 34.04,
+    "level_3": 41.51
+  },
+  "compression": {
+    "level_1": 22.13,
+    "level_2": 23.23,
+    "level_3": 31.28
+  }
+}

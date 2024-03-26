@@ -67,7 +67,8 @@ Example for IEMOCAP:
 python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
 ```
 
-You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to corrupted versions of 4 different (neutral, happy, sad, and angry) utterances.
+You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to corrupted versions of 4
+different (neutral, happy, sad, and angry) utterances.
 
 🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with
 the `-d` flag. Example:
@@ -78,8 +79,10 @@ python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_pat
 
 The corrupted datasets will be saved in the specified output path.
 The `robuser_config.yaml` file, with the corruption configuration, will be generated in the
-corrupted dataset's root. Additionally, for certain types of corruptions, the `robuser_metadata.csv` file will also be created.
-This CSV file contains information about the applied corruptions for each original utterance, including, for instance, the specific noise file
+corrupted dataset's root. Additionally, for certain types of corruptions, the `robuser_metadata.csv` file will also be
+created.
+This CSV file contains information about the applied corruptions for each original utterance, including, for instance,
+the specific noise file
 used for background noise corruption or the impulse response file used for impulse response corruption.
 
 ## 📊 Evaluating the model predictions
@@ -116,6 +119,25 @@ Example for IEMOCAP:
 ```
 python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
+
+## 📈 Robustness Evaluation
+
+After you've evaluated your model on the corrupted datasets, you can calculate the Corruption Error (CE) and Relative
+Corruption Error metrics.
+Fill the `results/model_metrics.json` file with the error rates of your model on the clean and corrupted datasets, and then run
+the `calculate_ce.py` script:
+
+```
+python3 src/evaluation/calculate_ce.py -b <baseline_metrics.json> -i results/model_metrics.json
+```
+
+Example for IEMOCAP:
+
+```
+python3 src/evaluation/calculate_ce.py -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
+```
+
+The script will output the CE and relative CE metrics as defined in the section _Robustness evaluation_ of the paper.
 
 ## 📝 How to contribute
 
