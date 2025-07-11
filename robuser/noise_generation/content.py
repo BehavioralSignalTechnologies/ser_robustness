@@ -11,7 +11,7 @@ import librosa
 import numpy as np
 
 from robuser.noise_generation.corruptions import NoiseGeneration
-from robuser.noise_generation.utils import normalize_audio
+from robuser.noise_generation.utils import normalize_audio, get_supported_audio_extensions
 
 
 class ContentCorruption(NoiseGeneration):
@@ -50,9 +50,10 @@ class ContentCorruption(NoiseGeneration):
             a sorted list with the audio files
         """
         audio_files = []
+        audio_extensions = get_supported_audio_extensions()
         for root, dirs, files in os.walk(self.dataset_path):
             for file in files:
-                if file.endswith(".wav"):
+                if file.lower().endswith(audio_extensions):
                     audio_files.append(os.path.join(root, file))
 
         if len(audio_files) != len(set([os.path.basename(file) for file in audio_files])):

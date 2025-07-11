@@ -79,7 +79,7 @@ def gain_corruption(label, audio_data, sample_rate):
 # Compression artifacts
 from robuser.noise_generation.compression import Compression
 
-def compress_audio(iemocap_audio, label, sample_rate):
+def compress_audio(audio_file_path, label, sample_rate):
     output_file_path = f"{label}_compressed_8kbps.wav"
     if os.path.exists(output_file_path):
         os.remove(output_file_path)
@@ -89,7 +89,7 @@ def compress_audio(iemocap_audio, label, sample_rate):
     }
 
     compression_8 = Compression(compress_config)
-    compression_8.run(iemocap_audio, sample_rate, output_file_path)
+    compression_8.run(audio_file_path, sample_rate, output_file_path)
 
     return output_file_path
 

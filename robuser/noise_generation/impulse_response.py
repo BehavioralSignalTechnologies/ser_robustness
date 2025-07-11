@@ -6,6 +6,7 @@ import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
 from robuser.noise_generation.corruptions import NoiseGeneration
+from robuser.noise_generation.utils import get_supported_audio_extensions
 
 
 def calculate_rt60(impulse_response_path):
@@ -55,9 +56,10 @@ class AddImpulseResponse(NoiseGeneration):
               f" with RT60 in range [{self.rt60_min}, {self.rt60_max}]")
 
     def load_dataset(self, path, rt60_min, rt60_max):
+        audio_extensions = get_supported_audio_extensions()
         for root, dirs, files in os.walk(path):
             for file in files:
-                if file.endswith('.wav'):
+                if file.lower().endswith(audio_extensions):
                     rt60 = calculate_rt60(os.path.join(root, file))
                     if rt60_min <= rt60 <= rt60_max:
                         yield os.path.join(root, file)

@@ -5,6 +5,16 @@ import soundfile as sf
 import warnings
 
 
+def get_supported_audio_extensions():
+    """
+    Returns a tuple of supported audio file extensions.
+    
+    Returns:
+        tuple: Supported audio file extensions in lowercase
+    """
+    return (".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aac", ".wma")
+
+
 def normalize_audio(signal):
     """A function to normalize a signal according to its mean and std.
 
@@ -30,11 +40,12 @@ def resample_dataset(folder_path, resampled_folder_path):
 
     target_sr = None
     need_resampling = False
+    audio_extensions = get_supported_audio_extensions()
 
     # Iterate through the original folder to find the target sample rate
     for root, _, files in os.walk(folder_path):
         for file in files:
-            if file.endswith(".wav"):
+            if file.lower().endswith(audio_extensions):
                 _, target_sr = librosa.load(os.path.join(root, file), sr=None)
                 break
         if target_sr:
@@ -43,7 +54,7 @@ def resample_dataset(folder_path, resampled_folder_path):
     # Iterate through the resampled folder to resample files
     for root, dirs, files in os.walk(resampled_folder_path):
         for file in files:
-            if file.endswith(".wav"):
+            if file.lower().endswith(audio_extensions):
                 file_path = os.path.join(root, file)
                 y, sr = librosa.load(file_path, sr=None)
 

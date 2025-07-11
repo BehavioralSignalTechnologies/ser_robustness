@@ -12,7 +12,7 @@ class Parser(ABC):
         Returns:
             A dictionary with the following format:
             {
-                '/path/to/audio_file_1.wav': {'emotion': 'class_name', ...},
+                '/path/to/audio_file_1.ext': {'emotion': 'class_name', ...},
                 ...
             }
         """

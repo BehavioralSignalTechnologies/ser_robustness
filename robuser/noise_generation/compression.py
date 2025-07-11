@@ -8,8 +8,8 @@ from robuser.noise_generation.corruptions import NoiseGeneration
 
 class Compression(NoiseGeneration):
     """ A perturbator that compresses the audio file to a given bit_rate using ffmpeg.
-    The file is being compressed to the given format, then converted back to wav at
-    the original sample rate with 1 channel.
+    The file is being compressed to the given format, then converted back to the original
+    audio format at the original sample rate with 1 channel.
     """
 
     def __init__(self, config):

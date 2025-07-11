@@ -8,7 +8,7 @@ import yaml
 import soundfile as sf
 from tqdm import tqdm
 
-from robuser.noise_generation.utils import resample_dataset
+from robuser.noise_generation.utils import resample_dataset, get_supported_audio_extensions
 from robuser.noise_generation.get_corruption import get_corruption
 from robuser.parsing.get_parser import get_parser_for_dataset
 
@@ -23,7 +23,7 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
         ignore_extensions (list): list of file extensions to ignore
     """
     if ignore_extensions is None:
-        ignore_extensions = [".wav"]
+        ignore_extensions = list(get_supported_audio_extensions())
 
     print(f"Copying the original dataset to: {corrupted_dataset_path}")
     for root, _, files in os.walk(original_dataset_path):
@@ -66,9 +66,10 @@ def corrupt_dataset(
         files_dict = dict(sorted(files_dict.items()))
     else:
         files_dict = {}
+        audio_extensions = get_supported_audio_extensions()
         for root, _, files in os.walk(original_dataset_path):
             for file in files:
-                if file.endswith(".wav"):
+                if file.lower().endswith(audio_extensions):
                     file_path = os.path.join(root, file)
                     files_dict[file_path] = None
 
@@ -84,7 +85,7 @@ def corrupt_dataset(
     # Copy the original dataset to the corrupted dataset path
     # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
     if not skip_copy:
-        copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
+        copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=list(get_supported_audio_extensions()))
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)

@@ -15,6 +15,7 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
 from robuser.parsing.parser import Parser
+from robuser.noise_generation.utils import get_supported_audio_extensions
 
 
 class ParserForIEMOCAP(Parser):
@@ -50,9 +51,10 @@ class ParserForIEMOCAP(Parser):
     def resample_iemocap(self, session):
         with ThreadPoolExecutor() as executor:
             files_to_resample = []
+            audio_extensions = get_supported_audio_extensions()
             for root, _, files in os.walk(self.wav_files_path % session):
                 for file in files:
-                    if file.endswith(".wav"):
+                    if file.lower().endswith(audio_extensions):
                         files_to_resample.append(os.path.join(root, file))
 
             list(tqdm(executor.map(self.resample_audio, files_to_resample), total=len(files_to_resample),
@@ -75,10 +77,11 @@ class ParserForIEMOCAP(Parser):
         for root, dirs, files in os.walk(self.wav_files_path % session):
             if not dirs:
                 dialog = os.path.basename(root)
+                audio_extensions = get_supported_audio_extensions() + (".npz",)
                 dialog_to_utterances[dialog] = [
-                    os.path.join(root, wavfile)
-                    for wavfile in files if
-                    os.path.splitext(wavfile)[1] in (".wav", ".npz")]
+                    os.path.join(root, audiofile)
+                    for audiofile in files if
+                    os.path.splitext(audiofile)[1].lower() in audio_extensions]
         return dialog_to_utterances
 
     def get_annotation_per_utterance_per_dialog(self,
