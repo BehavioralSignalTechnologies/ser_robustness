@@ -89,7 +89,9 @@ def compress_audio(audio_file_path, label, sample_rate):
     }
 
     compression_8 = Compression(compress_config)
-    compression_8.run(audio_file_path, sample_rate, output_file_path)
+    corrupted_audio, _ = compression_8.run(audio_file_path, sample_rate)
+
+    sf.write(output_file_path, corrupted_audio, sample_rate)
 
     return output_file_path
 
