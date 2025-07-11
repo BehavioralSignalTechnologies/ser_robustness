@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa.display
-import librosa, os, shutil
-import IPython.display as ipd
+import librosa, os
 import soundfile as sf
 import os
 
@@ -19,7 +18,7 @@ def get_spectrogram(audio_path, label):
 
 
 # Gaussian Noise
-from gaussian import AWGNAugmentation
+from robuser.noise_generation.gaussian import AWGNAugmentation
 
 def gaussian_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gaussian_10.wav"
@@ -39,7 +38,7 @@ def gaussian_corruption(label, audio_data, sample_rate):
 
 
 # Clipping distortion
-from clipping_distortion import AddClippingDistortion
+from robuser.noise_generation.clipping_distortion import AddClippingDistortion
 
 def clipping_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_clipping_40.wav"
@@ -58,7 +57,7 @@ def clipping_corruption(label, audio_data, sample_rate):
     return output_file_path
 
 # Gain Transition
-from gain_transition import AddGainTransition
+from robuser.noise_generation.gain_transition import AddGainTransition
 
 def gain_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gain_transition_30_10.wav"
@@ -78,7 +77,7 @@ def gain_corruption(label, audio_data, sample_rate):
 
 
 # Compression artifacts
-from compression import Compression
+from robuser.noise_generation.compression import Compression
 
 def compress_audio(iemocap_audio, label, sample_rate):
     output_file_path = f"{label}_compressed_8kbps.wav"
@@ -96,7 +95,7 @@ def compress_audio(iemocap_audio, label, sample_rate):
 
 
 # Reverberation
-from impulse_response import AddImpulseResponse
+from robuser.noise_generation.impulse_response import AddImpulseResponse
 import warnings
 
 def reverberation(label, audio_data, sample_rate):
@@ -134,7 +133,7 @@ urban_config = {
     'snr': 20
 }
 
-from content import ContentCorruption
+from robuser.noise_generation.content import ContentCorruption
 
 def background_noise(label, audio_data, sample_rate, config):
     noise_dataset = os.path.basename(config['content_dataset_path'])

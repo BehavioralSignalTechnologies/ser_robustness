@@ -4,18 +4,18 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 
 ## 💁 Installation guidelines
 
-- Install & activate poetry *(used for managing dependencies)*
-
-```
-pip3 install poetry
-poetry shell
-poetry install --no-root
-```
-
 - Install FFmpeg & libasound2-dev:
 
 ```
 sudo apt install ffmpeg libasound2-dev
+```
+
+- Install using uv
+
+```
+uv venv -p python3.12
+source .venv/bin/activate
+uv sync --active
 ```
 
 > The dependencies have been installed 👏

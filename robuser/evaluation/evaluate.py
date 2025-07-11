@@ -1,13 +1,10 @@
 import argparse
 import os
-import sys
 
 from sklearn.metrics import accuracy_score, recall_score
 from sklearn.metrics import confusion_matrix
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from parsing.get_parser import get_parser_for_dataset
+from robuser.parsing.get_parser import get_parser_for_dataset
 
 
 def parse_csv(preds_csv):
@@ -126,7 +123,8 @@ def parse_args():
     return args
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the console script"""
     args = parse_args()
 
     preds = parse_csv(args.predictions)
@@ -148,3 +146,7 @@ if __name__ == "__main__":
               f"UA: {overall_results[1]:.2f}%")
     else:
         raise ValueError(f"Invalid dataset: {args.dataset}")
+
+
+if __name__ == "__main__":
+    main()

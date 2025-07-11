@@ -2,18 +2,15 @@ import argparse
 import itertools
 import os
 import shutil
-import sys
 
 import librosa
 import yaml
 import soundfile as sf
 from tqdm import tqdm
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import resample_dataset
-from parsing.get_parser import get_parser_for_dataset
-from noise_generation.get_corruption import get_corruption
+from robuser.noise_generation.utils import resample_dataset
+from robuser.noise_generation.get_corruption import get_corruption
+from robuser.parsing.get_parser import get_parser_for_dataset
 
 
 def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=None):
@@ -230,10 +227,15 @@ def parse_arguments():
     return args_parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
+    """Main entry point for the console script"""
     args = parse_arguments()
 
     with open(args.config, "r") as file:
         config = yaml.safe_load(file)
 
     corrupt(args.dataset, args.input, args.output, config, args.force, args.skip_copy)
+
+
+if __name__ == '__main__':
+    main()

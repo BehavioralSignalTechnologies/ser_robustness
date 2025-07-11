@@ -1,9 +1,9 @@
-from noise_generation.content import ContentCorruption
-from noise_generation.gaussian import AWGNAugmentation
-from noise_generation.gain_transition import AddGainTransition
-from noise_generation.clipping_distortion import AddClippingDistortion
-from noise_generation.impulse_response import AddImpulseResponse
-from noise_generation.compression import Compression
+from robuser.noise_generation.content import ContentCorruption
+from robuser.noise_generation.gaussian import AWGNAugmentation
+from robuser.noise_generation.gain_transition import AddGainTransition
+from robuser.noise_generation.clipping_distortion import AddClippingDistortion
+from robuser.noise_generation.impulse_response import AddImpulseResponse
+from robuser.noise_generation.compression import Compression
 
 
 def get_corruption(corruption_name):

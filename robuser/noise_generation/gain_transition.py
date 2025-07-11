@@ -1,4 +1,4 @@
-from corruptions import NoiseGeneration
+from robuser.noise_generation.corruptions import NoiseGeneration
 from audiomentations import GainTransition
 import random
 

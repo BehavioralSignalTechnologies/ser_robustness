@@ -1,4 +1,4 @@
-from parsing.iemocap import ParserForIEMOCAP
+from robuser.parsing.iemocap import ParserForIEMOCAP
 
 
 def get_parser_for_dataset(dataset_name):

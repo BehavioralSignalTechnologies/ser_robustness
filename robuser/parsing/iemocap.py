@@ -14,7 +14,7 @@ import soundfile as sf
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
-from parsing.parser import Parser
+from robuser.parsing.parser import Parser
 
 
 class ParserForIEMOCAP(Parser):

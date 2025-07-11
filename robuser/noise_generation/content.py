@@ -4,16 +4,14 @@
 
 import os
 import random
-import shutil
 import warnings
 from itertools import cycle
 
 import librosa
 import numpy as np
-from scipy.io import wavfile
 
-from corruptions import NoiseGeneration
-from utils import normalize_audio
+from robuser.noise_generation.corruptions import NoiseGeneration
+from robuser.noise_generation.utils import normalize_audio
 
 
 class ContentCorruption(NoiseGeneration):

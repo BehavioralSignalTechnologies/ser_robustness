@@ -5,7 +5,7 @@ import librosa
 import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
-from corruptions import NoiseGeneration
+from robuser.noise_generation.corruptions import NoiseGeneration
 
 
 def calculate_rt60(impulse_response_path):

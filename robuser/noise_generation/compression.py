@@ -3,7 +3,7 @@ from subprocess import run, DEVNULL
 import os
 import soundfile as sf
 
-from corruptions import NoiseGeneration
+from robuser.noise_generation.corruptions import NoiseGeneration
 
 
 class Compression(NoiseGeneration):
