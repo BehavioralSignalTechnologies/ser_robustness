@@ -18,7 +18,7 @@ def get_spectrogram(audio_path, label):
 
 
 # Gaussian Noise
-from robuser.noise_generation.gaussian import AWGNAugmentation
+from robuser.corruptions.gaussian import AWGNAugmentation
 
 def gaussian_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gaussian_10.wav"
@@ -38,7 +38,7 @@ def gaussian_corruption(label, audio_data, sample_rate):
 
 
 # Clipping distortion
-from robuser.noise_generation.clipping_distortion import AddClippingDistortion
+from robuser.corruptions.clipping_distortion import AddClippingDistortion
 
 def clipping_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_clipping_40.wav"
@@ -57,7 +57,7 @@ def clipping_corruption(label, audio_data, sample_rate):
     return output_file_path
 
 # Gain Transition
-from robuser.noise_generation.gain_transition import AddGainTransition
+from robuser.corruptions.gain_transition import AddGainTransition
 
 def gain_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gain_transition_30_10.wav"
@@ -77,7 +77,7 @@ def gain_corruption(label, audio_data, sample_rate):
 
 
 # Compression artifacts
-from robuser.noise_generation.compression import Compression
+from robuser.corruptions.compression import Compression
 
 def compress_audio(audio_file_path, label, sample_rate):
     output_file_path = f"{label}_compressed_8kbps.wav"
@@ -97,7 +97,7 @@ def compress_audio(audio_file_path, label, sample_rate):
 
 
 # Reverberation
-from robuser.noise_generation.impulse_response import AddImpulseResponse
+from robuser.corruptions.impulse_response import AddImpulseResponse
 import warnings
 
 def reverberation(label, audio_data, sample_rate):
@@ -135,7 +135,7 @@ urban_config = {
     'snr': 20
 }
 
-from robuser.noise_generation.content import ContentCorruption
+from robuser.corruptions.content import ContentCorruption
 
 def background_noise(label, audio_data, sample_rate, config):
     noise_dataset = os.path.basename(config['content_dataset_path'])

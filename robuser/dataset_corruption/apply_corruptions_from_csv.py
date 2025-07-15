@@ -7,7 +7,7 @@ import librosa
 import soundfile as sf
 from tqdm import tqdm
 
-from robuser.noise_generation.get_corruption import get_corruption
+from robuser.corruptions.get_corruption import get_corruption
 
 
 def parse_corruption_metadata(metadata_str):
@@ -98,7 +98,7 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             audio, sr = librosa.load(audio_file_path, sr=None)
 
             # Apply the corruption
-            augmented_audio, noise_type = corruption.run(audio, sr)
+            augmented_audio, corruption_type = corruption.run(audio, sr)
             sf.write(output_file_path, augmented_audio, sr)
 
             print(

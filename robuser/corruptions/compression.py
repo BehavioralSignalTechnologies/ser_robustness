@@ -4,10 +4,10 @@ from subprocess import run, DEVNULL
 import os
 import soundfile as sf
 
-from robuser.noise_generation.corruptions import NoiseGeneration
+from robuser.corruptions.corruption_type import CorruptionType
 
 
-class Compression(NoiseGeneration):
+class Compression(CorruptionType):
     """ A perturbator that compresses the audio file to a given bit_rate using ffmpeg.
     The file is being compressed to the given format, then converted back to the original
     audio format at the original sample rate with 1 channel.

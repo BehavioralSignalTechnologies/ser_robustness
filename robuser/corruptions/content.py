@@ -10,11 +10,11 @@ from itertools import cycle
 import librosa
 import numpy as np
 
-from robuser.noise_generation.corruptions import NoiseGeneration
-from robuser.noise_generation.utils import normalize_audio, get_supported_audio_extensions
+from robuser.corruptions.corruption_type import CorruptionType
+from robuser.corruptions.utils import normalize_audio, get_supported_audio_extensions
 
 
-class ContentCorruption(NoiseGeneration):
+class ContentCorruption(CorruptionType):
     """
     Class that augments the audio data with content from a sound dataset
     config should contain:

@@ -8,8 +8,8 @@ import yaml
 import soundfile as sf
 from tqdm import tqdm
 
-from robuser.noise_generation.utils import get_supported_audio_extensions
-from robuser.noise_generation.get_corruption import get_corruption
+from robuser.corruptions.utils import get_supported_audio_extensions
+from robuser.corruptions.get_corruption import get_corruption
 from robuser.parsing.get_parser import get_parser_for_dataset
 
 
@@ -100,14 +100,14 @@ def corrupt_dataset(
     ):
         # Load the audio file
         audio, sr = librosa.load(file_path, sr=None)
-        augmented_audio, noise_type = corruption.run(audio, sr)
+        augmented_audio, corruption_type = corruption.run(audio, sr)
 
         # file_path is an absolute path, find the relative path to the original_dataset_path
         relative_path = os.path.relpath(file_path, original_dataset_path)
         output_file_path = os.path.join(corrupted_dataset_path, relative_path)
 
         # Save the corrupted audio file
-        robuser_metadata[output_file_path] = noise_type
+        robuser_metadata[output_file_path] = corruption_type
         os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 
         sf.write(output_file_path, augmented_audio, sr)
@@ -118,7 +118,7 @@ def corrupt_dataset(
 
         # Save as CSV
         with open(metadata_path, "w") as file:
-            file.write("file_path,noise_type\n")
+            file.write("file_path,corruption_type\n")
             for key, value in robuser_metadata.items():
                 file.write(f"{key},{value}\n")
 

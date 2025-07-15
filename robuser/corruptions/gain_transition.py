@@ -1,8 +1,8 @@
-from robuser.noise_generation.corruptions import NoiseGeneration
+from robuser.corruptions.corruption_type import CorruptionType
 from audiomentations import GainTransition
 import random
 
-class AddGainTransition(NoiseGeneration):
+class AddGainTransition(CorruptionType):
     """
     Gradually change the volume up or down over a random time span. Also known as
     fade in and fade out. 

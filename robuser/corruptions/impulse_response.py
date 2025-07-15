@@ -5,8 +5,8 @@ import librosa
 import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
-from robuser.noise_generation.corruptions import NoiseGeneration
-from robuser.noise_generation.utils import get_supported_audio_extensions
+from robuser.corruptions.corruption_type import CorruptionType
+from robuser.corruptions.utils import get_supported_audio_extensions
 
 
 def calculate_rt60(impulse_response_path):
@@ -22,7 +22,7 @@ def calculate_rt60(impulse_response_path):
     return rt60
 
 
-class AddImpulseResponse(NoiseGeneration):
+class AddImpulseResponse(CorruptionType):
     """
     Convolve the audio with a randomly selected impulse response.
 

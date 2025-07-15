@@ -15,7 +15,7 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
 from robuser.parsing.parser import Parser
-from robuser.noise_generation.utils import get_supported_audio_extensions
+from robuser.corruptions.utils import get_supported_audio_extensions
 
 
 class ParserForIEMOCAP(Parser):

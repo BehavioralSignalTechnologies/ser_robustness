@@ -1,7 +1,7 @@
-from robuser.noise_generation.corruptions import NoiseGeneration
+from robuser.corruptions.corruption_type import CorruptionType
 from audiomentations import ClippingDistortion
 
-class AddClippingDistortion(NoiseGeneration):
+class AddClippingDistortion(CorruptionType):
     """
     Distort signal by clipping a random percentage of points
 
