@@ -1,3 +1,3 @@
 """
-Noise generation module for audio corruption
+Module with various noise generation methods
 """
