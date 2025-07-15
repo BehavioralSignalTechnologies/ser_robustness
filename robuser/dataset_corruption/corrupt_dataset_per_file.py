@@ -1,3 +1,7 @@
+"""
+Applies corruptions to an audio dataset based on a CSV file, which specifies the corruption type and metadata per audio file.
+"""
+
 import argparse
 import csv
 import json
@@ -6,6 +10,8 @@ import os
 import librosa
 import soundfile as sf
 from tqdm import tqdm
+from frozendict import frozendict
+
 
 from robuser.corruptions.get_corruption import get_corruption
 
@@ -21,7 +27,10 @@ def parse_corruption_metadata(metadata_str):
         dict: Parsed corruption configuration
     """
     try:
-        return json.loads(metadata_str)
+        metadata_dict = json.loads(metadata_str)
+        # Sort by keys to ensure consistent ordering
+        metadata_dict = {k: metadata_dict[k] for k in sorted(metadata_dict.keys())}
+        return frozendict(metadata_dict)
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON in corruption metadata: {metadata_str}. Error: {e}")
 
@@ -35,9 +44,10 @@ def apply_corruption_from_csv(csv_file_path, force=False):
         force (bool): Force overwrite output files if they already exist
     """
 
-    # Read the CSV file
-    corruptions_to_apply = []
+    corruptions_to_apply = {}
+    corruption_types = set()
 
+    # Read the CSV file containing per-file corruption specifications
     with open(csv_file_path, "r") as csvfile:
         reader = csv.DictReader(csvfile)
 
@@ -54,45 +64,41 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             )
 
         for row in reader:
-            corruptions_to_apply.append(
-                {
-                    "audio_file_path": row["audio_file_path"],
-                    "corruption_type": row["corruption_type"],
-                    "corruption_metadata": parse_corruption_metadata(row["corruption_metadata"]),
-                    "output_file_path": row["output_file_path"],
-                }
+            corr_metadata = parse_corruption_metadata(row["corruption_metadata"])
+            corruption_key = (row["corruption_type"], corr_metadata)
+            if corruption_key not in corruptions_to_apply:
+                corruptions_to_apply[corruption_key] = []
+            corruptions_to_apply[corruption_key].append(
+                (row["audio_file_path"], row["output_file_path"])
             )
+            corruption_types.add(row["corruption_type"])
 
-    print(f"Found {len(corruptions_to_apply)} corruptions to apply")
+    # Print the number of audio files for each corruption type
+    for corruption_type in corruption_types:
+        len_audio_files = 0
+        len_corruptions = 0
+        for corruption_key, audio_files in corruptions_to_apply.items():
+            if corruption_key[0] == corruption_type:
+                len_audio_files += len(audio_files)
+                len_corruptions += 1
+        print(f"Number of audio files for {corruption_type}: {len_audio_files}, {len_corruptions} unique corruption configurations")
 
-    # Process each corruption
-    for corruption_spec in tqdm(corruptions_to_apply, desc="Applying corruptions"):
-        audio_file_path = corruption_spec["audio_file_path"]
-        corruption_type = corruption_spec["corruption_type"]
-        corruption_config = corruption_spec["corruption_metadata"]
-        output_file_path = corruption_spec["output_file_path"]
+    # Apply the corruptions
+    for (corruption_type, corruption_metadata), audio_files in tqdm(
+        corruptions_to_apply.items(), desc="Applying corruptions"
+    ):
+        corruption_class = get_corruption(corruption_type)
+        corruption = corruption_class(corruption_metadata)
 
-        # Check if input file exists
-        if not os.path.exists(audio_file_path):
-            print(f"Warning: Input file does not exist: {audio_file_path}. Skipping.")
-            continue
-
-        # Check if output file already exists
-        if os.path.exists(output_file_path) and not force:
-            print(
-                f"Warning: Output file already exists: {output_file_path}. Use --force to overwrite. Skipping."
-            )
-            continue
-
-        try:
+        for audio_file_path, output_file_path in audio_files:
+            # Check if output file already exists
+            if os.path.exists(output_file_path) and not force:
+                print(
+                    f"Warning: Output file already exists: {output_file_path}. Use --force to overwrite. Skipping."
+                )
+                continue
             # Create output directory if it doesn't exist
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-
-            # Get the corruption class
-            corruption_class = get_corruption(corruption_type)
-
-            # Initialize the corruption
-            corruption = corruption_class(corruption_config)
 
             # Load the audio file
             audio, sr = librosa.load(audio_file_path, sr=None)
@@ -100,16 +106,6 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             # Apply the corruption
             augmented_audio, corruption_type = corruption.run(audio, sr)
             sf.write(output_file_path, augmented_audio, sr)
-
-            print(
-                f"Successfully applied {corruption_type} corruption to {audio_file_path} -> {output_file_path}"
-            )
-
-        except Exception as e:
-            print(f"Error applying {corruption_type} corruption to {audio_file_path}: {e}")
-            # Clean up partial output file if it was created
-            if os.path.exists(output_file_path):
-                os.remove(output_file_path)
 
 
 def parse_arguments():

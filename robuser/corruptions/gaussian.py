@@ -20,7 +20,7 @@ class AWGNAugmentation(CorruptionType):
 
         self.snr = config["snr"]
 
-        self.transform = AddGaussianSNR(min_snr_in_db=self.snr, max_snr_in_db=self.snr, p=1.0)
+        self.transform = AddGaussianSNR(min_snr_db=self.snr, max_snr_db=self.snr, p=1.0)
 
     def run(self, audio_data, sample_rate):
         """

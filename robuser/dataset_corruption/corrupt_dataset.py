@@ -1,3 +1,8 @@
+"""
+Applies corruptions to an audio dataset based on a yaml configuration file, making as many copies of the original dataset as there are corruptions.
+"""
+
+
 import argparse
 import itertools
 import os
