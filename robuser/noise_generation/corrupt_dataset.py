@@ -8,7 +8,7 @@ import yaml
 import soundfile as sf
 from tqdm import tqdm
 
-from robuser.noise_generation.utils import resample_dataset, get_supported_audio_extensions
+from robuser.noise_generation.utils import get_supported_audio_extensions
 from robuser.noise_generation.get_corruption import get_corruption
 from robuser.parsing.get_parser import get_parser_for_dataset
 
@@ -89,14 +89,6 @@ def corrupt_dataset(
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
-
-    if corruption_type == "impulse_response":
-        # Resample the reverberation dataset if needed
-        resampled_path = corruption_config["ir_path"] + "_resampled"
-        shutil.copytree(corruption_config["ir_path"], resampled_path, dirs_exist_ok=True)
-        resample_dataset(original_dataset_path, resampled_path)
-        corruption_config["ir_path"] = resampled_path
-
     corruption = corruption_class(corruption_config)
 
     # Metadata for the corrupted dataset

@@ -64,7 +64,7 @@ class AddImpulseResponse(NoiseGeneration):
                     if rt60_min <= rt60 <= rt60_max:
                         yield os.path.join(root, file)
 
-    def run(self, audio_data, sample_rate, output_file_path=None):
+    def run(self, audio_data, sample_rate):
         """
         Run the impulse response method
 

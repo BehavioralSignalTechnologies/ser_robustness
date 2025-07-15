@@ -2,14 +2,12 @@ import argparse
 import csv
 import json
 import os
-import shutil
 
 import librosa
 import soundfile as sf
 from tqdm import tqdm
 
 from robuser.noise_generation.get_corruption import get_corruption
-from robuser.noise_generation.utils import resample_dataset
 
 
 def parse_corruption_metadata(metadata_str):
@@ -92,20 +90,6 @@ def apply_corruption_from_csv(csv_file_path, force=False):
 
             # Get the corruption class
             corruption_class = get_corruption(corruption_type)
-
-            # Handle special case for impulse_response corruption
-            if corruption_type == "impulse_response":
-                # Resample the reverberation dataset if needed
-                if "ir_path" in corruption_config:
-                    resampled_path = corruption_config["ir_path"] + "_resampled"
-                    if not os.path.exists(resampled_path):
-                        shutil.copytree(
-                            corruption_config["ir_path"], resampled_path, dirs_exist_ok=True
-                        )
-                        # We need to get the sample rate of the input audio to resample properly
-                        _, sr = librosa.load(audio_file_path, sr=None)
-                        resample_dataset(os.path.dirname(audio_file_path), resampled_path)
-                    corruption_config["ir_path"] = resampled_path
 
             # Initialize the corruption
             corruption = corruption_class(corruption_config)
