@@ -1,6 +1,6 @@
 # Corruption Types 🦾
 
-Here, we describe the various types of noises and effects applied to the clean dataset and the parameters that can be adjusted to customize the corruption process.
+Here, we describe the various types of corruptions applied to the clean dataset and the parameters that can be adjusted to customize the corruption process.
 For a detailed explanation of the configuration file, refer to the [Configuration](configuration.md) section.
 
 

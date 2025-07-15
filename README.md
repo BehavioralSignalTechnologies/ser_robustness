@@ -40,7 +40,7 @@ Currently, **RobuSER** supports the:
 ## 📈 Usage
 
 1. Modify the `config.yml` to specify the corruption types and levels.
-2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory.
+2. Then you can run the `corrupt_dataset.py` script
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] [-d DATASET] [-c CONFIG]
@@ -64,7 +64,7 @@ optional arguments:
 Example for IEMOCAP:
 
 ```
-python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
+python3 -m robuser.dataset_corruption.corrupt_dataset -i <dataset_path> -o <output_path> -d iemocap
 ```
 
 You can also download the [examples.html](examples/examples.html) file, to listen to corrupted versions of 4
@@ -74,7 +74,7 @@ different (neutral, happy, sad, and angry) utterances.
 the `-d` flag. Example:
 
 ```
-python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
+python3 robuser.dataset_corruption.corrupt_dataset -i <dataset_path> -o <output_path> --skip_copy
 ```
 
 The corrupted datasets will be saved in the specified output path.
@@ -117,24 +117,24 @@ optional arguments:
 Example for IEMOCAP:
 
 ```
-python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
+python3 robuser.evaluation.evaluate -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
 
 ## 📈 Robustness Evaluation
 
 After you've evaluated your model on the corrupted datasets, you can calculate the Corruption Error (CE) and Relative
 Corruption Error metrics.
-Fill the `results/model_metrics.json` file with the error rates of your model on the clean and corrupted datasets, and then run
+Fill the `results/model_metrics.json` file with the error rate of your model on the clean and corrupted datasets, and then run
 the `calculate_ce.py` script:
 
 ```
-python3 src/evaluation/calculate_ce.py -b <baseline_metrics.json> -i results/model_metrics.json
+python3 robuser.evaluation.calculate_ce -b <baseline_metrics.json> -i results/model_metrics.json
 ```
 
 Example for IEMOCAP:
 
 ```
-python3 src/evaluation/calculate_ce.py -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
+python3 robuser.evaluation.calculate_ce -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
 ```
 
 The script will output the CE and relative CE metrics as defined in the section _Robustness evaluation_ of the paper.
