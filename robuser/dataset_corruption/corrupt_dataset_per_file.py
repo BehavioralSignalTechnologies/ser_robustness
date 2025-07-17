@@ -94,7 +94,7 @@ def apply_corruption_from_csv(csv_file_path, force=False):
         corruption_class = get_corruption(corruption_type)
         corruption = corruption_class(corruption_metadata)
 
-        for audio_file_path, output_file_path in audio_files:
+        for audio_file_path, output_file_path in tqdm(audio_files, desc=f"Applying {corruption_type}"):
             # Check if output file already exists
             if os.path.exists(output_file_path) and not force:
                 print(
