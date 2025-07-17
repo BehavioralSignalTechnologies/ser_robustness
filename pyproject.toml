@@ -27,7 +27,7 @@ dev = [
 ]
 
 [tool.pdm.build]
-includes = ["*.py"]
+includes = ["robuser/"]
 
 [build-system]
 requires = ["pdm-backend"]
