@@ -46,6 +46,8 @@ def apply_corruption_from_csv(csv_file_path, force=False):
     Args:
         csv_file_path (str): Path to the CSV file containing corruption specifications
         force (bool): Force overwrite output files if they already exist
+    Returns:
+        dict: Dictionary mapping input audio file paths to the paths of applied noise files (for applicable corruptions)
     """
 
     corruptions_to_apply = {}
@@ -77,6 +79,7 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             )
             corruption_types.add(row["corruption_type"])
 
+    applied_noise_paths = {}
     # Print the number of audio files for each corruption type
     for corruption_type in corruption_types:
         len_audio_files = 0
@@ -108,9 +111,11 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             audio, sr = librosa.load(audio_file_path, sr=None)
 
             # Apply the corruption
-            augmented_audio, corruption_type = corruption.run(audio, sr)
+            augmented_audio, applied_noise_path = corruption.run(audio, sr)
             sf.write(output_file_path, augmented_audio, sr)
+            applied_noise_paths[audio_file_path] = applied_noise_path
 
+    return applied_noise_paths
 
 def parse_arguments():
     """
