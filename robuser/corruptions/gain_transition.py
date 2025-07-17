@@ -26,7 +26,7 @@ class AddGainTransition(CorruptionType):
 
         if "min_max_gain_db" not in config:
             raise ValueError("The min_max_gain_db parameter is required")
-        if not isinstance(config["min_max_gain_db"], list):
+        if not isinstance(config["min_max_gain_db"], (list, tuple)) or len(config["min_max_gain_db"]) != 2:
             raise ValueError("min_max_gain_db must be a list of \
                              [min_gain_db, max_gain_db] pair")
 

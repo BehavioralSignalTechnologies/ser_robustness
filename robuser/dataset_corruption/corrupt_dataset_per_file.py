@@ -30,6 +30,10 @@ def parse_corruption_metadata(metadata_str):
         metadata_dict = json.loads(metadata_str)
         # Sort by keys to ensure consistent ordering
         metadata_dict = {k: metadata_dict[k] for k in sorted(metadata_dict.keys())}
+        # Convert lists to tuples for immutability
+        for key, value in metadata_dict.items():
+            if isinstance(value, list):
+                metadata_dict[key] = tuple(value)
         return frozendict(metadata_dict)
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON in corruption metadata: {metadata_str}. Error: {e}")
