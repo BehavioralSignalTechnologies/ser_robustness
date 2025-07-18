@@ -15,7 +15,7 @@ sudo apt install ffmpeg libasound2-dev
 ```
 uv venv -p python3.12
 source .venv/bin/activate
-uv sync --active
+uv pip install git+https://github.com/BehavioralSignalTechnologies/ser_robustness.git
 ```
 
 > The dependencies have been installed 👏
