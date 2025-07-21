@@ -107,13 +107,18 @@ def apply_corruption_from_csv(csv_file_path, force=False):
             # Create output directory if it doesn't exist
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 
-            # Load the audio file
-            audio, sr = librosa.load(audio_file_path, sr=None)
-
             # Apply the corruption
-            augmented_audio, applied_noise_path = corruption.run(audio, sr)
-            sf.write(output_file_path, augmented_audio, sr)
-            applied_noise_paths[audio_file_path] = applied_noise_path
+            try:
+                # Load the audio file
+                audio, sr = librosa.load(audio_file_path, sr=None)
+                augmented_audio, applied_noise_path = corruption.run(audio, sr)
+                sf.write(output_file_path, augmented_audio, sr)
+                applied_noise_paths[audio_file_path] = applied_noise_path
+            except Exception as e:
+                print(
+                    f"Error applying corruption to {audio_file_path}: {e}. Skipping this file."
+                )
+                continue
 
     return applied_noise_paths
 
