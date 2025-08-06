@@ -170,7 +170,14 @@ def main():
     if not os.path.exists(args.input):
         raise FileNotFoundError(f"CSV file not found: {args.input}")
 
-    apply_corruption_from_csv(args.input, args.force)
+    applied_noise_paths = apply_corruption_from_csv(args.input, args.force)
+    output_file = "applied_noise_paths.csv"
+    with open(output_file, "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["audio_file_path", "applied_noise_path"])
+        for audio_file_path, applied_noise_path in applied_noise_paths.items():
+            writer.writerow([audio_file_path, applied_noise_path])
+    print(f"CSV with the applied noise paths saved to {output_file}")
     print("Corruption application completed!")
 
 
