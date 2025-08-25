@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa.display
-import librosa, os, shutil
-import IPython.display as ipd
+import librosa, os
 import soundfile as sf
 import os
 
@@ -19,7 +18,7 @@ def get_spectrogram(audio_path, label):
 
 
 # Gaussian Noise
-from gaussian import AWGNAugmentation
+from robuser.corruptions.gaussian import AWGNAugmentation
 
 def gaussian_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gaussian_10.wav"
@@ -39,7 +38,7 @@ def gaussian_corruption(label, audio_data, sample_rate):
 
 
 # Clipping distortion
-from clipping_distortion import AddClippingDistortion
+from robuser.corruptions.clipping_distortion import AddClippingDistortion
 
 def clipping_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_clipping_40.wav"
@@ -58,7 +57,7 @@ def clipping_corruption(label, audio_data, sample_rate):
     return output_file_path
 
 # Gain Transition
-from gain_transition import AddGainTransition
+from robuser.corruptions.gain_transition import AddGainTransition
 
 def gain_corruption(label, audio_data, sample_rate):
     output_file_path = f"{label}_gain_transition_30_10.wav"
@@ -78,9 +77,9 @@ def gain_corruption(label, audio_data, sample_rate):
 
 
 # Compression artifacts
-from compression import Compression
+from robuser.corruptions.compression import Compression
 
-def compress_audio(iemocap_audio, label, sample_rate):
+def compress_audio(audio_file_path, label, sample_rate):
     output_file_path = f"{label}_compressed_8kbps.wav"
     if os.path.exists(output_file_path):
         os.remove(output_file_path)
@@ -90,13 +89,15 @@ def compress_audio(iemocap_audio, label, sample_rate):
     }
 
     compression_8 = Compression(compress_config)
-    compression_8.run(iemocap_audio, sample_rate, output_file_path)
+    corrupted_audio, _ = compression_8.run(audio_file_path, sample_rate)
+
+    sf.write(output_file_path, corrupted_audio, sample_rate)
 
     return output_file_path
 
 
 # Reverberation
-from impulse_response import AddImpulseResponse
+from robuser.corruptions.impulse_response import AddImpulseResponse
 import warnings
 
 def reverberation(label, audio_data, sample_rate):
@@ -106,7 +107,7 @@ def reverberation(label, audio_data, sample_rate):
         os.remove(output_file_path)
 
     reverb_config = {
-        'ir_path': "../../datasets/EchoThiefImpulseResponseLibrary/Underground",
+        'ir_path': "../datasets/EchoThiefImpulseResponseLibrary/Underground",
         'rt60_range': [0.1, 0.5],
     }
 
@@ -120,21 +121,21 @@ def reverberation(label, audio_data, sample_rate):
 
 # Add background noise
 esc_config = {
-    'content_dataset_path': '../../datasets/ESC-50-master',
+    'content_dataset_path': '../datasets/ESC-50-master',
     'snr': 0
 }
 
 musan_config = {
-    'content_dataset_path': '../../datasets/musan',
+    'content_dataset_path': '../datasets/musan',
     'snr': 10
 }
 
 urban_config = {
-    'content_dataset_path': '../../datasets/urbansound8k',
+    'content_dataset_path': '../datasets/urbansound8k',
     'snr': 20
 }
 
-from content import ContentCorruption
+from robuser.corruptions.content import ContentCorruption
 
 def background_noise(label, audio_data, sample_rate, config):
     noise_dataset = os.path.basename(config['content_dataset_path'])

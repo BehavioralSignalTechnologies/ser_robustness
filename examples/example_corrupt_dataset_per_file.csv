@@ -1,0 +1,7 @@
+audio_file_path,corruption_type,corruption_metadata,output_file_path
+example.wav,content,"{""content_dataset_path"": ""datasets/ESC-50"", ""snr"": 10}",output/content_snr10.wav
+example.wav,gaussian,"{""snr"": 10}",output/gaussian_snr10.wav
+example.wav,gain_transition,"{""min_max_gain_db"": [-20.0,-10.0]}",output/gain_transition.wav
+example.wav,clipping_distortion,"{""max_percentile_threshold"": 20}",output/clipping_distortion.wav
+example.wav,impulse_response,"{""ir_path"": ""datasets/EchoThiefImpulseResponseLibrary_resampled"", ""rt60_range"": [0.2, 0.5]}",output/impulse_response.wav
+example.wav,compression,"{""bit_rate"": 16}",output/compression_16kbps.wav

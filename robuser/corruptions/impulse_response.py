@@ -5,7 +5,8 @@ import librosa
 import pyroomacoustics as pra
 from audiomentations import ApplyImpulseResponse
 
-from corruptions import NoiseGeneration
+from robuser.corruptions.corruption_type import CorruptionType
+from robuser.corruptions.utils import get_supported_audio_extensions
 
 
 def calculate_rt60(impulse_response_path):
@@ -21,7 +22,7 @@ def calculate_rt60(impulse_response_path):
     return rt60
 
 
-class AddImpulseResponse(NoiseGeneration):
+class AddImpulseResponse(CorruptionType):
     """
     Convolve the audio with a randomly selected impulse response.
 
@@ -39,15 +40,24 @@ class AddImpulseResponse(NoiseGeneration):
             :param config: dictionary with the configuration parameters
         """
         super().__init__(config)
-        self.ir_path = config["ir_path"]
-        self.rt60_min, self.rt60_max = config["rt60_range"]
 
-        if self.ir_path is None:
-            raise ValueError(f"The {self.ir_path} is not provided." +
+        if "ir_path" not in config:
+            raise ValueError("The ir_path is not provided. " +
                              "Please provide the path to the impulse response files.")
+
+        if "rt60_range" not in config:
+            raise ValueError("The rt60_range is not provided. " +
+                             "Please provide the range of RT60 in seconds.")
+        
+        self.ir_path = config["ir_path"]
 
         if not os.path.exists(self.ir_path):
             raise ValueError(f"The {self.ir_path} does not exist.")
+        
+        if not isinstance(config["rt60_range"], (list, tuple)) or len(config["rt60_range"]) != 2:
+            raise ValueError("rt60_range must be a list or tuple of [min_rt60, max_rt60]")
+        
+        self.rt60_min, self.rt60_max = config["rt60_range"]
 
         random.seed(42)
         self.selected_irs = list(self.load_dataset(self.ir_path, rt60_min=self.rt60_min, rt60_max=self.rt60_max))
@@ -55,14 +65,15 @@ class AddImpulseResponse(NoiseGeneration):
               f" with RT60 in range [{self.rt60_min}, {self.rt60_max}]")
 
     def load_dataset(self, path, rt60_min, rt60_max):
+        audio_extensions = get_supported_audio_extensions()
         for root, dirs, files in os.walk(path):
             for file in files:
-                if file.endswith('.wav'):
+                if file.lower().endswith(audio_extensions):
                     rt60 = calculate_rt60(os.path.join(root, file))
                     if rt60_min <= rt60 <= rt60_max:
                         yield os.path.join(root, file)
 
-    def run(self, audio_data, sample_rate, output_file_path=None):
+    def run(self, audio_data, sample_rate):
         """
         Run the impulse response method
 

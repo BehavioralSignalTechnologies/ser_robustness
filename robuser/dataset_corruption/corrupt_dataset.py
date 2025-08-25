@@ -1,19 +1,21 @@
+"""
+Applies corruptions to an audio dataset based on a yaml configuration file, making as many copies of the original dataset as there are corruptions.
+"""
+
+
 import argparse
 import itertools
 import os
 import shutil
-import sys
 
 import librosa
 import yaml
 import soundfile as sf
 from tqdm import tqdm
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import resample_dataset
-from parsing.get_parser import get_parser_for_dataset
-from noise_generation.get_corruption import get_corruption
+from robuser.corruptions.utils import get_supported_audio_extensions
+from robuser.corruptions.get_corruption import get_corruption
+from robuser.parsing.get_parser import get_parser_for_dataset
 
 
 def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=None):
@@ -26,7 +28,7 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
         ignore_extensions (list): list of file extensions to ignore
     """
     if ignore_extensions is None:
-        ignore_extensions = [".wav"]
+        ignore_extensions = list(get_supported_audio_extensions())
 
     print(f"Copying the original dataset to: {corrupted_dataset_path}")
     for root, _, files in os.walk(original_dataset_path):
@@ -39,8 +41,15 @@ def copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extension
                 shutil.copy2(file_path, output_file_path)
 
 
-def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type, corruption_config,
-                    force=False, skip_copy=False):
+def corrupt_dataset(
+    original_dataset_path,
+    corrupted_dataset_path,
+    dataset_name,
+    corruption_type,
+    corruption_config,
+    force=False,
+    skip_copy=False,
+):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
 
@@ -55,16 +64,17 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
     """
 
     # Parse the original dataset
-    if dataset_name != None:
+    if dataset_name is not None:
         parser_class = get_parser_for_dataset(dataset_name)
         parser = parser_class(original_dataset_path)
         files_dict = parser.run_parser()
         files_dict = dict(sorted(files_dict.items()))
-    else: 
+    else:
         files_dict = {}
+        audio_extensions = get_supported_audio_extensions()
         for root, _, files in os.walk(original_dataset_path):
             for file in files:
-                if file.endswith(".wav"):
+                if file.lower().endswith(audio_extensions):
                     file_path = os.path.join(root, file)
                     files_dict[file_path] = None
 
@@ -74,53 +84,38 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
             shutil.rmtree(corrupted_dataset_path)
         else:
             raise FileExistsError(
-                f"The corrupted dataset already exists at {corrupted_dataset_path}. Use --force to overwrite it.")
+                f"The corrupted dataset already exists at {corrupted_dataset_path}. Use --force to overwrite it."
+            )
 
     # Copy the original dataset to the corrupted dataset path
     # This is a convenient dataset-agnostic way to keep the original dataset structure and metadata
     if not skip_copy:
-        copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=[".wav"])
+        copy_dataset(original_dataset_path, corrupted_dataset_path, ignore_extensions=list(get_supported_audio_extensions()))
 
     # Initialize the corruption class
     corruption_class = get_corruption(corruption_type)
-
-    if corruption_type == "impulse_response":
-        # Resample the reverberation dataset if needed
-        resampled_path = corruption_config['ir_path'] + "_resampled"
-        shutil.copytree(corruption_config['ir_path'], resampled_path, dirs_exist_ok=True)
-        resample_dataset(original_dataset_path, resampled_path)
-        corruption_config['ir_path'] = resampled_path
-
     corruption = corruption_class(corruption_config)
 
     # Metadata for the corrupted dataset
     robuser_metadata = {}
 
     # Corrupt the dataset
-    for file_path in tqdm(files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"):
-        if corruption_type == 'compression':
-            _, sr = librosa.load(file_path, sr=None)
+    for file_path in tqdm(
+        files_dict, desc=f"Corrupting dataset with '{corruption_type}' corruption"
+    ):
+        # Load the audio file
+        audio, sr = librosa.load(file_path, sr=None)
+        augmented_audio, corruption_type = corruption.run(audio, sr)
 
-            relative_path = os.path.relpath(file_path, original_dataset_path)
-            output_file_path = os.path.join(corrupted_dataset_path, relative_path)
-            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+        # file_path is an absolute path, find the relative path to the original_dataset_path
+        relative_path = os.path.relpath(file_path, original_dataset_path)
+        output_file_path = os.path.join(corrupted_dataset_path, relative_path)
 
-            corruption.run(file_path, sr, output_file_path)
-            robuser_metadata[output_file_path] = None
-        else:
-            # Load the audio file
-            audio, sr = librosa.load(file_path, sr=None)
-            augmented_audio, noise_type = corruption.run(audio, sr)
+        # Save the corrupted audio file
+        robuser_metadata[output_file_path] = corruption_type
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 
-            # file_path is an absolute path, find the relative path to the original_dataset_path
-            relative_path = os.path.relpath(file_path, original_dataset_path)
-            output_file_path = os.path.join(corrupted_dataset_path, relative_path)
-
-            # Save the corrupted audio file
-            robuser_metadata[output_file_path] = noise_type
-            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-
-            sf.write(output_file_path, augmented_audio, sr)
+        sf.write(output_file_path, augmented_audio, sr)
 
     # Save the metadata
     if not all(value is None for value in robuser_metadata.values()):
@@ -128,7 +123,7 @@ def corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name,
 
         # Save as CSV
         with open(metadata_path, "w") as file:
-            file.write("file_path,noise_type\n")
+            file.write("file_path,corruption_type\n")
             for key, value in robuser_metadata.items():
                 file.write(f"{key},{value}\n")
 
@@ -179,7 +174,14 @@ def get_corruption_str(corruption_type, corruption_config):
     return corruption_type + config_str
 
 
-def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corruptions_config, force=False, skip_copy=False):
+def corrupt(
+    dataset_name,
+    original_dataset_path,
+    corrupted_datasets_path,
+    corruptions_config,
+    force=False,
+    skip_copy=False,
+):
     """
     Corrupts the original dataset with the specified corruption type and configuration.
 
@@ -195,14 +197,24 @@ def corrupt(dataset_name, original_dataset_path, corrupted_datasets_path, corrup
     corruptions_list = parse_config(corruptions_config)
     for corruption_type, corruption_config in tqdm(corruptions_list, desc="Corrupting datasets"):
         if dataset_name is None:
-            corrupted_dataset_path = os.path.join(corrupted_datasets_path,
-                                              f"{get_corruption_str(corruption_type, corruption_config)}")
+            corrupted_dataset_path = os.path.join(
+                corrupted_datasets_path, f"{get_corruption_str(corruption_type, corruption_config)}"
+            )
         else:
-            corrupted_dataset_path = os.path.join(corrupted_datasets_path,
-                                              f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}")
+            corrupted_dataset_path = os.path.join(
+                corrupted_datasets_path,
+                f"{dataset_name}_{get_corruption_str(corruption_type, corruption_config)}",
+            )
         try:
-            corrupt_dataset(original_dataset_path, corrupted_dataset_path, dataset_name, corruption_type,
-                            corruption_config, force, skip_copy)
+            corrupt_dataset(
+                original_dataset_path,
+                corrupted_dataset_path,
+                dataset_name,
+                corruption_type,
+                corruption_config,
+                force,
+                skip_copy,
+            )
             with open(os.path.join(corrupted_dataset_path, "robuser_config.yaml"), "w") as file_:
                 yaml.dump(corruption_config, file_)
         except Exception as e:
@@ -215,25 +227,47 @@ def parse_arguments():
     @brief Parse Arguments for corrupting the dataset.
     """
     args_parser = argparse.ArgumentParser(description="Corrupt the dataset")
-    args_parser.add_argument('-i', '--input', required=True,
-                             help="Path of the original dataset")
-    args_parser.add_argument('-o', '--output', required=True,
-                             help="Path where the corrupted versions of the dataset will be saved")
-    args_parser.add_argument('-f', '--force', action="store_true",
-                             help="Force overwrite the corrupted dataset if it already exists")
-    args_parser.add_argument('-s', '--skip_copy', action="store_true",
-                             help="Skip copying the original dataset to the corrupted dataset path and only generate the corrupted wav files.")
-    args_parser.add_argument('-d', '--dataset', required=False,
-                             help="Name of the dataset (e.g. iemocap)")
-    args_parser.add_argument('-c', '--config', type=str, default="config.yml",
-                             help="Path to the YAML configuration for the corruptions")
+    args_parser.add_argument("-i", "--input", required=True, help="Path of the original dataset")
+    args_parser.add_argument(
+        "-o",
+        "--output",
+        required=True,
+        help="Path where the corrupted versions of the dataset will be saved",
+    )
+    args_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force overwrite the corrupted dataset if it already exists",
+    )
+    args_parser.add_argument(
+        "-s",
+        "--skip_copy",
+        action="store_true",
+        help="Skip copying the original dataset to the corrupted dataset path and only generate the corrupted wav files.",
+    )
+    args_parser.add_argument(
+        "-d", "--dataset", required=False, help="Name of the dataset (e.g. iemocap)"
+    )
+    args_parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        default="config.yml",
+        help="Path to the YAML configuration for the corruptions",
+    )
     return args_parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
+    """Main entry point for the console script"""
     args = parse_arguments()
 
     with open(args.config, "r") as file:
         config = yaml.safe_load(file)
 
     corrupt(args.dataset, args.input, args.output, config, args.force, args.skip_copy)
+
+
+if __name__ == "__main__":
+    main()

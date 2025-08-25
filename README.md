@@ -4,18 +4,18 @@ A robustness evaluation benchmarking procedure for Speech Emotion Recognition (S
 
 ## 💁 Installation guidelines
 
-- Install & activate poetry *(used for managing dependencies)*
-
-```
-pip3 install poetry
-poetry shell
-poetry install --no-root
-```
-
 - Install FFmpeg & libasound2-dev:
 
 ```
 sudo apt install ffmpeg libasound2-dev
+```
+
+- Install using uv
+
+```
+uv venv -p python3.12
+source .venv/bin/activate
+uv pip install git+https://github.com/BehavioralSignalTechnologies/ser_robustness.git
 ```
 
 > The dependencies have been installed 👏
@@ -39,8 +39,14 @@ Currently, **RobuSER** supports the:
 
 ## 📈 Usage
 
+**RobuSER** provides two main approaches for applying audio corruptions:
+
+### 🎯 Method 1: Batch Dataset Corruption (`corrupt_dataset.py`)
+
+This method applies the same corruption types and levels to all audio files in a dataset, based on a YAML configuration file.
+
 1. Modify the `config.yml` to specify the corruption types and levels.
-2. Then you can run the `corrupt_dataset.py` script in the `src/noise_generation` directory.
+2. Then you can run the `corrupt_dataset.py` script
 
 ```
 usage: corrupt_dataset.py [-h] -i INPUT -o OUTPUT [-f] [-s] [-d DATASET] [-c CONFIG]
@@ -64,17 +70,14 @@ optional arguments:
 Example for IEMOCAP:
 
 ```
-python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> -d iemocap
+python3 -m robuser.dataset_corruption.corrupt_dataset -i <dataset_path> -o <output_path> -d iemocap
 ```
-
-You can also download the [examples.html](src/noise_generation/examples.html) file, to listen to corrupted versions of 4
-different (neutral, happy, sad, and angry) utterances.
 
 🚨 You can use the script to corrupt any directory (without any labels), by not providing a specific dataset with
 the `-d` flag. Example:
 
 ```
-python3 src/noise_generation/corrupt_dataset.py -i <dataset_path> -o <output_path> --skip_copy
+python3 -m robuser.dataset_corruption.corrupt_dataset -i <dataset_path> -o <output_path> --skip_copy
 ```
 
 The corrupted datasets will be saved in the specified output path.
@@ -84,6 +87,59 @@ created.
 This CSV file contains information about the applied corruptions for each original utterance, including, for instance,
 the specific noise file
 used for background noise corruption or the impulse response file used for impulse response corruption.
+
+
+### 🎯 Method 2: Per-File Custom Corruption (`corrupt_dataset_per_file.py`)
+
+This method allows you to apply **different corruption types and parameters to individual audio files** based on a CSV specification.
+
+```
+usage: corrupt_dataset_per_file.py [-h] -i INPUT [-f]
+
+Apply audio corruptions based on CSV specifications
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Path to the CSV file containing corruption specifications
+  -f, --force           Force overwrite output files if they already exist
+```
+
+#### CSV Format
+
+The CSV file must contain the following columns:
+- `audio_file_path`: Path to the input audio file
+- `corruption_type`: Type of corruption (gaussian, compression, clipping_distortion, gain_transition, impulse_response, content)
+- `corruption_metadata`: JSON string with corruption parameters
+- `output_file_path`: Path where the corrupted audio will be saved
+
+#### Example CSV Content
+
+```csv
+audio_file_path,corruption_type,corruption_metadata,output_file_path
+example.wav,content,"{""content_dataset_path"": ""datasets/ESC-50"", ""snr"": 10}",output/content_snr10.wav
+example.wav,gaussian,"{""snr"": 10}",output/gaussian_snr10.wav
+example.wav,gain_transition,"{""min_max_gain_db"": [-20.0,-10.0]}",output/gain_transition.wav
+```
+
+#### Corruption Metadata Examples
+
+- **Gaussian noise**: `{"snr": 10}`
+- **Compression**: `{"bit_rate": 16}`
+- **Clipping distortion**: `{"max_percentile_threshold": 20}`
+- **Gain transition**: `{"min_max_gain_db": [-40.0, -20.0]}`
+- **Impulse response**: `{"ir_path": "/path/to/impulse/responses", "rt60_range": [0.1, 0.5]}`
+- **Content noise**: `{"content_dataset_path": "/path/to/noise/dataset", "snr": 10}`
+
+#### Usage Example
+
+```
+python3 -m robuser.dataset_corruption.corrupt_dataset_per_file -i examples/example_corrupt_dataset_per_file.csv
+```
+
+You can also download the [examples.html](examples/examples.html) file, to listen to corrupted versions of 4
+different (neutral, happy, sad, and angry) utterances.
+
 
 ## 📊 Evaluating the model predictions
 
@@ -117,24 +173,24 @@ optional arguments:
 Example for IEMOCAP:
 
 ```
-python3 src/evaluation/evaluate.py -csv <predictions_path> -p <dataset_path> -d iemocap
+python3 robuser.evaluation.evaluate -csv <predictions_path> -p <dataset_path> -d iemocap
 ```
 
 ## 📈 Robustness Evaluation
 
 After you've evaluated your model on the corrupted datasets, you can calculate the Corruption Error (CE) and Relative
 Corruption Error metrics.
-Fill the `results/model_metrics.json` file with the error rates of your model on the clean and corrupted datasets, and then run
+Fill the `results/model_metrics.json` file with the error rate of your model on the clean and corrupted datasets, and then run
 the `calculate_ce.py` script:
 
 ```
-python3 src/evaluation/calculate_ce.py -b <baseline_metrics.json> -i results/model_metrics.json
+python3 robuser.evaluation.calculate_ce -b <baseline_metrics.json> -i results/model_metrics.json
 ```
 
 Example for IEMOCAP:
 
 ```
-python3 src/evaluation/calculate_ce.py -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
+python3 robuser.evaluation.calculate_ce -b results/iemocap_baseline_metrics.json -i results/model_metrics.json
 ```
 
 The script will output the CE and relative CE metrics as defined in the section _Robustness evaluation_ of the paper.

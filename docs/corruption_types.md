@@ -1,6 +1,6 @@
 # Corruption Types 🦾
 
-Here, we describe the various types of noises and effects applied to the clean dataset and the parameters that can be adjusted to customize the corruption process.
+Here, we describe the various types of corruptions applied to the clean dataset and the parameters that can be adjusted to customize the corruption process.
 For a detailed explanation of the configuration file, refer to the [Configuration](configuration.md) section.
 
 
@@ -50,6 +50,11 @@ Configure the `impulse_response` section in the `config.yml` file to apply impul
 
 ### Download the dataset
 - [**EchoThief Impulse Response Library**](http://www.echothief.com/wp-content/uploads/2016/06/EchoThiefImpulseResponseLibrary.zip)
+
+You can resample the dataset to match your data sample rate.
+Otherwise, the impulse responses will be resampled on the fly, potentially hurting execution time.
+Additionally, note that the RT60 values of the dataset will be calculated on the dataset without resampling and it may affect their values.
+If you are unsure about your dataset's sample rate or there are multiple sample rates across audios, do nothing and let the code resample on the fly.
 
 ### Default RT60 range values:
 - 0.1-0.5 seconds

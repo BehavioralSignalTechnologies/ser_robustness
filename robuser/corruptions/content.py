@@ -4,19 +4,17 @@
 
 import os
 import random
-import shutil
 import warnings
 from itertools import cycle
 
 import librosa
 import numpy as np
-from scipy.io import wavfile
 
-from corruptions import NoiseGeneration
-from utils import normalize_audio
+from robuser.corruptions.corruption_type import CorruptionType
+from robuser.corruptions.utils import normalize_audio, get_supported_audio_extensions
 
 
-class ContentCorruption(NoiseGeneration):
+class ContentCorruption(CorruptionType):
     """
     Class that augments the audio data with content from a sound dataset
     config should contain:
@@ -52,9 +50,10 @@ class ContentCorruption(NoiseGeneration):
             a sorted list with the audio files
         """
         audio_files = []
+        audio_extensions = get_supported_audio_extensions()
         for root, dirs, files in os.walk(self.dataset_path):
             for file in files:
-                if file.endswith(".wav"):
+                if file.lower().endswith(audio_extensions):
                     audio_files.append(os.path.join(root, file))
 
         if len(audio_files) != len(set([os.path.basename(file) for file in audio_files])):
