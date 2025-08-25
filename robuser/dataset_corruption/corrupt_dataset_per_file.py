@@ -113,7 +113,7 @@ def apply_corruption_from_csv(csv_file_path, force=False):
                 audio, sr = librosa.load(audio_file_path, sr=None)
                 augmented_audio, applied_noise_path = corruption.run(audio, sr)
                 sf.write(output_file_path, augmented_audio, sr)
-                applied_noise_paths[audio_file_path] = applied_noise_path
+                applied_noise_paths[output_file_path] = applied_noise_path
             except Exception as e:
                 print(
                     f"Error applying corruption to {audio_file_path}: {e}. Skipping this file."
