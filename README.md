@@ -109,7 +109,7 @@ optional arguments:
 
 The CSV file must contain the following columns:
 - `audio_file_path`: Path to the input audio file
-- `corruption_type`: Type of corruption (gaussian, compression, clipping_distortion, gain_transition, impulse_response, content)
+- `corruption_type`: Type of corruption (gaussian, compression, clipping_distortion, gain_transition, impulse_response, content, or a labelled one: noise_snr, rir, clipping_sdr, level, telephony_codec, chain; see [Labelled corruptions](./docs/corruption_types.md#labelled-corruptions-))
 - `corruption_metadata`: JSON string with corruption parameters
 - `output_file_path`: Path where the corrupted audio will be saved
 
