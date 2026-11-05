@@ -149,6 +149,6 @@ class ContentCorruption(CorruptionType):
 
         # Apply the SNR and normalize the augmented signal
         s_aug = self.apply_snr(signal, noise)
-        s_aug = s_aug / np.abs(s_aug.max())
+        s_aug = s_aug / np.abs(s_aug).max()
 
         return s_aug, noise_basename
