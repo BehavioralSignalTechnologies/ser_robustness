@@ -22,17 +22,16 @@ class CorruptionType:
         """
         raise NotImplementedError
 
-    def run_with_info(self, audio_data, sample_rate, rng=None, context=None):
+    def run_with_info(self, audio_data, sample_rate, rng=None):
         """
         Run the corruption and also return what was applied.
 
-        Labelled corruptions override this to return the measured degradation (e.g. SNR, C50, SDR) and every
-        parameter needed to reproduce the output. The default wraps run() for the existing corruptions.
+        Corruptions that support it override this to return the measured degradation (e.g. SNR, C50, SDR) and the
+        parameters needed to reproduce the output. The default wraps run().
 
         :param audio_data: numpy array with the audio data
         :param sample_rate: the sample rate of the audio data
-        :param rng: numpy Generator for any random choice (labelled corruptions are deterministic given it)
-        :param context: dict shared by the steps of a chain (e.g. the speech mask of the clean input)
+        :param rng: optional numpy Generator for the random choices; None keeps each corruption's original randomness
         :return: tuple with the corrupted audio data (numpy array) and a dict with the applied parameters/labels
         """
         audio, applied = self.run(audio_data, sample_rate)

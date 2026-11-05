@@ -15,10 +15,22 @@ sudo apt install ffmpeg libasound2-dev
 ```
 uv venv -p python3.12
 source .venv/bin/activate
-uv pip install git+https://github.com/BehavioralSignalTechnologies/ser_robustness.git
+uv pip install "git+https://github.com/BehavioralSignalTechnologies/ser_robustness.git@v0.2.0"
 ```
 
 > The dependencies have been installed 👏
+
+### 🏷️ Versions
+
+Pin a version (a tag) rather than `main` or a commit; the changes of every version are in the
+[CHANGELOG](./CHANGELOG.md). To be notified of new versions on GitHub: Watch → Custom → Releases.
+
+- **v0.1.0** reproduces the paper's results.
+- **v0.2.0** fixes the output normalisation of `content`, which changes the paper's `content` outputs for the files
+  whose negative peak is larger than their positive one; the other corruptions' defaults are unchanged.
+
+Outputs of `compression` depend on the ffmpeg / libopus build. v0.2.0 was tested with ffmpeg 6.1 and libopus 1.3.1
+(Ubuntu 22.04 packages), numpy 1.26.4 and scipy 1.16.0.
 
 ## 📰 Documentation
 
@@ -94,7 +106,7 @@ used for background noise corruption or the impulse response file used for impul
 This method allows you to apply **different corruption types and parameters to individual audio files** based on a CSV specification.
 
 ```
-usage: corrupt_dataset_per_file.py [-h] -i INPUT [-f]
+usage: corrupt_dataset_per_file.py [-h] -i INPUT [-f] [--info_output INFO_OUTPUT] [-w WORKERS]
 
 Apply audio corruptions based on CSV specifications
 
@@ -103,13 +115,17 @@ optional arguments:
   -i INPUT, --input INPUT
                         Path to the CSV file containing corruption specifications
   -f, --force           Force overwrite output files if they already exist
+  --info_output INFO_OUTPUT
+                        CSV with the labels and parameters applied to each output file
+  -w WORKERS, --workers WORKERS
+                        Number of parallel processes
 ```
 
 #### CSV Format
 
 The CSV file must contain the following columns:
 - `audio_file_path`: Path to the input audio file
-- `corruption_type`: Type of corruption (gaussian, compression, clipping_distortion, gain_transition, impulse_response, content, or a labelled one: noise_snr, rir, clipping_sdr, level, telephony_codec, chain; see [Labelled corruptions](./docs/corruption_types.md#labelled-corruptions-))
+- `corruption_type`: Type of corruption (gaussian, compression, clipping_distortion, gain_transition, impulse_response, content, level, chain)
 - `corruption_metadata`: JSON string with corruption parameters
 - `output_file_path`: Path where the corrupted audio will be saved
 
@@ -130,6 +146,20 @@ example.wav,gain_transition,"{""min_max_gain_db"": [-20.0,-10.0]}",output/gain_t
 - **Gain transition**: `{"min_max_gain_db": [-40.0, -20.0]}`
 - **Impulse response**: `{"ir_path": "/path/to/impulse/responses", "rt60_range": [0.1, 0.5]}`
 - **Content noise**: `{"content_dataset_path": "/path/to/noise/dataset", "snr": 10}`
+- **Level**: `{"mode": "rms", "rms_db": [-35, -15]}`
+- **Chain** (several corruptions, one seed): `{"seed": 7, "steps": [{"type": "content", ...}, {"type": "level", "mode": "rms"}]}`
+
+#### Labels: what each corruption applied
+
+Every corruption returns what it applied (`run_with_info`), e.g. the measured SNR of `content`, the C50 / DRR / RT60
+of `impulse_response`, the SDR of `clipping_distortion`, so the outputs can be used as regression targets. The
+per-file mode writes them, one row per output file, to `--info_output` (default `corruption_info.csv`). An optional
+`"seed"` in a row's `corruption_metadata` makes that row reproducible on its own (every random choice of the
+corruption comes from it). See [Corruption types](./docs/corruption_types.md) for the options and returned fields.
+
+```
+python3 -m robuser.dataset_corruption.corrupt_dataset_per_file -i plan.csv --info_output info.csv --workers 16
+```
 
 #### Usage Example
 

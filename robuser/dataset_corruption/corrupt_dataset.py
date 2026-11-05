@@ -160,12 +160,18 @@ def get_corruption_str(corruption_type, corruption_config):
     """
     Returns a string representation of the corruption type and configuration.
     """
+    if corruption_type == "chain":
+        steps = corruption_config.get("steps", [])
+        return "chain_" + (corruption_config.get("name") or "+".join(step["type"] for step in steps))
     config_str = ""
     for key, value in corruption_config.items():
         if key == "enabled":
             continue
         if key == "content_dataset_path" or key == "ir_path":
-            config_str += f"_dataset_{os.path.basename(value)}"
+            if isinstance(value, (list, tuple)):  # a list of files / folders: the first one and the count
+                config_str += f"_dataset_{os.path.basename(os.path.normpath(value[0]))}_and_{len(value) - 1}_more"
+            else:
+                config_str += f"_dataset_{os.path.basename(value)}"
         elif isinstance(value, list):
             config_str += f"_{key}_{'_'.join(map(str, value))}"
         else:

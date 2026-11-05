@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 import librosa
 import soundfile as sf
@@ -65,3 +66,60 @@ def resample_dataset(folder_path, resampled_folder_path):
 
                     y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
                     sf.write(file_path, y, target_sr)
+
+
+def audio_files_in(paths, sort=True):
+    """Audio files of a path or a list of paths: a folder is walked, a file is taken as is.
+
+    Returns:
+        tuple: (list of audio files, sorted unless sort=False (os.walk order), True if any of the paths is a folder)
+    """
+    paths = [paths] if isinstance(paths, (str, os.PathLike)) else list(paths)
+    audio_extensions = get_supported_audio_extensions()
+    files, any_folder = [], False
+    for path in paths:
+        if not os.path.exists(path):
+            raise ValueError(f"Path {path} does not exist")
+        if os.path.isdir(path):
+            any_folder = True
+            for root, _, names in os.walk(path):
+                files.extend(os.path.join(root, n) for n in names if n.lower().endswith(audio_extensions))
+        else:
+            files.append(str(path))
+    return (sorted(files) if sort else files), any_folder
+
+
+def load_channel(path, sample_rate, channel=None, rng=None):
+    """Load an audio file at sample_rate (librosa). channel: None = downmix to mono, an int = that channel,
+    "random" = a channel drawn from rng (or Python's random if rng is None).
+
+    Returns:
+        tuple: (signal, channel used, or None for a downmix)
+    """
+    if channel is None:
+        y, _ = librosa.load(path, sr=sample_rate, mono=True)
+        return y, None
+    y, _ = librosa.load(path, sr=sample_rate, mono=False)
+    y = np.atleast_2d(y)
+    if channel == "random":
+        channel = int(rng.integers(y.shape[0])) if rng is not None else random.randrange(y.shape[0])
+    if not 0 <= int(channel) < y.shape[0]:
+        raise ValueError(f"channel {channel} out of range for {path} ({y.shape[0]} channels)")
+    return y[int(channel)], int(channel)
+
+
+def speech_mask(signal, sample_rate, frame_s=0.02, db_below_peak=35.0):
+    """Sample-level speech mask (energy VAD): 20 ms frames within 35 dB of the 95th-percentile frame energy."""
+    frame = int(round(frame_s * sample_rate))
+    n = len(signal) // frame
+    energy = 10 * np.log10(np.mean(signal[: n * frame].reshape(n, frame) ** 2, axis=1) + 1e-12)
+    active = energy > (np.percentile(energy, 95) - db_below_peak)
+    mask = np.zeros(len(signal), bool)
+    mask[: n * frame] = np.repeat(active, frame)
+    return mask
+
+
+def sdr_db(clean, distorted):
+    """Signal-to-distortion ratio in dB of `distorted` w.r.t. `clean` (inf if they are identical)."""
+    d = np.sum((np.asarray(clean, float) - np.asarray(distorted, float)) ** 2)
+    return float("inf") if d <= 0 else float(10 * np.log10(np.sum(np.asarray(clean, float) ** 2) / d))

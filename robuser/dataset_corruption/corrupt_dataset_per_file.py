@@ -9,6 +9,7 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 
 import librosa
+import numpy as np
 import soundfile as sf
 from tqdm import tqdm
 from frozendict import frozendict
@@ -47,6 +48,9 @@ def _apply_group(args):
     """Apply one corruption configuration to its files. Returns (applied_noise_paths, info_rows)."""
     corruption_type, corruption_metadata, audio_files, force = args
     corruption = get_corruption(corruption_type)(corruption_metadata)
+    # an optional "seed" in the metadata makes the row reproducible on its own: every random choice of the
+    # corruption comes from a generator seeded with it (for a chain, its own seed)
+    seed = corruption_metadata.get("seed")
     applied_noise_paths, info_rows = {}, []
     for audio_file_path, output_file_path in audio_files:
         # Check if output file already exists
@@ -60,7 +64,8 @@ def _apply_group(args):
         try:
             # Load the audio file
             audio, sr = librosa.load(audio_file_path, sr=None)
-            augmented_audio, info = corruption.run_with_info(audio, sr)
+            rng = np.random.default_rng(int(seed)) if seed is not None else None
+            augmented_audio, info = corruption.run_with_info(audio, sr, rng=rng)
             sf.write(output_file_path, augmented_audio, sr)
             applied_noise_paths[output_file_path] = info.get("applied_noise_path", info.get("noise_path"))
             info_rows.append({"audio_file_path": audio_file_path, "output_file_path": output_file_path,
@@ -175,6 +180,11 @@ Example corruption_metadata for different types:
 - gain_transition: {"min_max_gain_db": [-40.0, -20.0]}
 - impulse_response: {"ir_path": "/path/to/impulse/responses", "rt60_range": [0.1, 0.5]}
 - content: {"content_dataset_path": "/path/to/noise/dataset", "snr": 10}
+- content, one file at a speech-frame SNR: {"content_dataset_path": "cafe.wav", "snr": 7, "pad": "loop", "snr_mode": "speech", "seed": 3}
+- level: {"mode": "rms", "rms_db": [-35, -15], "seed": 3}
+- chain: {"seed": 3, "steps": [{"type": "content", ...}, {"type": "level", "mode": "rms"}]}
+An optional "seed" in the metadata makes a row reproducible on its own; the per-file labels and parameters returned
+by each corruption are written to --info_output.
         """,
     )
 
