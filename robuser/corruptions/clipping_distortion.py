@@ -61,13 +61,17 @@ class AddClippingDistortion(CorruptionType):
 
         self.p_clipping = 1.0
 
-    def clip_percentile(self, samples, percentile):
-        """Clip `percentile` % of the samples: below the lower / above the upper percentile, as audiomentations does,
-        with the share split between the sides by asym_ratio for asym."""
+    def percentile_thresholds(self, samples, percentile):
+        """(lower, upper) clipping thresholds for `percentile` % of clipped samples: the lower / upper percentiles, as
+        audiomentations uses, with the share split between the sides by asym_ratio for asym."""
         ratio = self.asym_ratio if self.clip_type == "asym" else 1.0
         more, less = percentile / (1 + ratio), percentile * ratio / (1 + ratio)
         low_share, high_share = (more, less) if self.asym_neg else (less, more)
-        lower, upper = np.percentile(samples, [low_share, 100 - high_share])
+        return np.percentile(samples, [low_share, 100 - high_share])
+
+    def clip_percentile(self, samples, percentile):
+        """Clip `percentile` % of the samples (see percentile_thresholds)."""
+        lower, upper = self.percentile_thresholds(samples, percentile)
         return np.clip(samples, lower, upper).astype(samples.dtype)
 
     def clip_soft(self, samples, theta):
@@ -95,8 +99,9 @@ class AddClippingDistortion(CorruptionType):
     def run_with_info(self, audio_data, sample_rate, rng=None):
         """
         Clip and return what was applied: sdr_db (measured), clip_type, clipped_pct, and with `sdr` also
-        target_sdr_db and the solved percentile (hard / asym) or theta (soft). Without `sdr` the clipped share is
-        drawn as before (Python's random, through audiomentations); with `sdr` nothing is random.
+        target_sdr_db and, for hard / asym, the solved percentile and the lower / upper thresholds as fractions of the
+        peak, or for soft the solved theta. Without `sdr` the clipped share is drawn as before (Python's random,
+        through audiomentations); with `sdr` nothing is random.
         """
         if self.target_sdr is None:
             transform = ClippingDistortion(
@@ -112,7 +117,10 @@ class AddClippingDistortion(CorruptionType):
             info.update(theta=float(param),
                         clipped_pct=float(np.mean(np.abs(audio_data) >= param * np.abs(audio_data).max()) * 100))
         else:
-            info.update(percentile=float(param), clipped_pct=float(np.mean(out != audio_data) * 100))
+            lower, upper = self.percentile_thresholds(audio_data, param)
+            peak = np.abs(audio_data).max()
+            info.update(percentile=float(param), clipped_pct=float(np.mean(out != audio_data) * 100),
+                        lower_threshold=float(lower / peak), upper_threshold=float(upper / peak))
         if self.clip_type == "asym":
             info.update(asym_ratio=self.asym_ratio, asym_neg=self.asym_neg)
         return out, info

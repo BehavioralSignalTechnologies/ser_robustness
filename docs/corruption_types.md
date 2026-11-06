@@ -114,7 +114,8 @@ SDR = 10 log10(Σ x² / Σ (x − clipped x)²) hits the target, and `max_percen
 | `asym_neg` | `true` / `false` | `true` | `asym`: the negative side is the more clipped one |
 
 Returned by `run_with_info`: `sdr_db` (measured, in both modes), `clipped_pct`, `clip_type`, and with `sdr` also
-`target_sdr_db` and the solved `percentile` (hard / asym) or `theta` (soft, × the peak).
+`target_sdr_db` and the solved `percentile` with `lower_threshold` / `upper_threshold` (× the peak) (hard / asym),
+or `theta` (soft, × the peak).
 
 
 ## Gain Transition 〽️
