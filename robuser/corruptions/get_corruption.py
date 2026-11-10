@@ -4,6 +4,8 @@ from robuser.corruptions.gain_transition import AddGainTransition
 from robuser.corruptions.clipping_distortion import AddClippingDistortion
 from robuser.corruptions.impulse_response import AddImpulseResponse
 from robuser.corruptions.compression import Compression
+from robuser.corruptions.level import Level
+from robuser.corruptions.chain import Chain
 
 
 def get_corruption(corruption_name):
@@ -16,8 +18,12 @@ def get_corruption(corruption_name):
     elif corruption_name == "clipping_distortion":
         return AddClippingDistortion
     elif corruption_name == "impulse_response":
-        return AddImpulseResponse   
+        return AddImpulseResponse
     elif corruption_name == "compression":
         return Compression
+    elif corruption_name == "level":
+        return Level
+    elif corruption_name == "chain":
+        return Chain
     else:
         raise ValueError(f"Unknown corruption: {corruption_name}")

@@ -40,3 +40,16 @@ compression:
     - 8
     - 16
     - 32
+level:
+  enabled: false
+  mode: [rms]
+  rms_db:
+    - [-35.0, -15.0]
+chain:
+  enabled: false
+  name: [noise+level+opus]
+  seed: [7]
+  steps:
+    - - {type: content, content_dataset_path: datasets/musan, snr: 10, pad: loop, snr_mode: speech}
+      - {type: level, mode: rms}
+      - {type: compression, codec: opus, bit_rate: 12}

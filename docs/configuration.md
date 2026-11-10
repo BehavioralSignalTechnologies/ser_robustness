@@ -38,6 +38,17 @@ The `config.yaml` file follows a structured format with different sections for e
                                    # at its original bit_rate
   - enabled:                       # if the process is enabled or not
   - bit_rate:                      # bit rate
+
+- level:                           # set the output level (random volume)
+  - enabled:                       # if the process is enabled or not
+  - mode:                          # rms (random RMS level) or peak
+  - rms_db:                        # list of [min, max] RMS dBFS ranges
+
+- chain:                           # several corruptions from one seed
+  - enabled:                       # if the process is enabled or not
+  - name:                          # output folder name
+  - seed:                          # seed
+  - steps:                         # list of step lists (one chain each)
 ```
 ## How to Use
 

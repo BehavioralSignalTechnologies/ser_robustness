@@ -1,6 +1,6 @@
 [project]
 name = "robuser"
-version = "0.0.1"
+version = "0.2.0"
 description = "A robustness evaluation benchmarking procedure for Speech Emotion Recognition (SER)"
 authors = [{ name = "Behavioral Signal Technologies" }]
 requires-python = "~=3.12"
