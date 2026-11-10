@@ -36,3 +36,8 @@ class CorruptionType:
         """
         audio, applied = self.run(audio_data, sample_rate)
         return audio, {"applied_noise_path": applied}
+
+    def applied_noise(self, info):
+        """What run() returns as the applied noise (e.g. the noise file or the impulse response), from the info that
+        run_with_info returned. Corruptions that override run_with_info override this to match their run()."""
+        return info.get("applied_noise_path")

@@ -67,7 +67,7 @@ def _apply_group(args):
             rng = np.random.default_rng(int(seed)) if seed is not None else None
             augmented_audio, info = corruption.run_with_info(audio, sr, rng=rng)
             sf.write(output_file_path, augmented_audio, sr)
-            applied_noise_paths[output_file_path] = info.get("applied_noise_path", info.get("noise_path"))
+            applied_noise_paths[output_file_path] = corruption.applied_noise(info)  # as run() returns it
             info_rows.append({"audio_file_path": audio_file_path, "output_file_path": output_file_path,
                               "corruption_type": corruption_type, **info})
         except Exception as e:

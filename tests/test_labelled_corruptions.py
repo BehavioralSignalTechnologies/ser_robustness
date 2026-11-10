@@ -130,3 +130,29 @@ def test_level_leaves_earlier_labels_unchanged(mode):
     assert sdr_db(x * gain, out) == pytest.approx(info["sdr_db"], abs=1e-6)
     assert level_info["peak"] <= 0.99 + 1e-9
     assert out.dtype == x.dtype
+
+
+def test_per_file_applied_noise_paths_match_run(tmp_path, noise_file, rir_file):
+    """corrupt_dataset_per_file reports the same applied noise as run(): the noise file name for content, the impulse
+    response path for impulse_response, None for the others."""
+    import csv
+    import json
+    import random
+
+    from robuser.dataset_corruption.corrupt_dataset_per_file import apply_corruption_from_csv
+
+    clean = tmp_path / "clean.wav"
+    sf.write(clean, speech_like(), SR)
+    specs = {"content": {"content_dataset_path": noise_file, "snr": 10},
+             "impulse_response": {"ir_path": rir_file}, "clipping_distortion": {"max_percentile_threshold": 20}}
+    plan = tmp_path / "plan.csv"
+    with open(plan, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["audio_file_path", "corruption_type", "corruption_metadata", "output_file_path"])
+        for t, meta in specs.items():
+            w.writerow([clean, t, json.dumps(meta), tmp_path / f"{t}.wav"])
+    random.seed(0)
+    applied = apply_corruption_from_csv(str(plan), force=True)
+    assert applied[str(tmp_path / "content.wav")] == "noise.wav"
+    assert applied[str(tmp_path / "impulse_response.wav")] == rir_file
+    assert applied[str(tmp_path / "clipping_distortion.wav")] is None

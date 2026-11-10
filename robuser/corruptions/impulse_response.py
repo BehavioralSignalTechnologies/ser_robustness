@@ -182,3 +182,7 @@ class AddImpulseResponse(CorruptionType):
         """
         ir_wav_path = self.select_ir()
         return self.convolve(audio_data, sample_rate, ir_wav_path), ir_wav_path
+
+    def applied_noise(self, info):
+        """The impulse response file, as run() returns it."""
+        return info["ir_path"]

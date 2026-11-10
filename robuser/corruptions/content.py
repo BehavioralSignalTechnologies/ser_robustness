@@ -230,4 +230,8 @@ class ContentCorruption(CorruptionType):
         :return: tuple of the augmented audio data (numpy array) and the applied noise filename
         """
         s_aug, info = self.run_with_info(audio_data, sample_rate)
-        return s_aug, "|".join(os.path.basename(p) for p in info["noise_path"].split("|"))
+        return s_aug, self.applied_noise(info)
+
+    def applied_noise(self, info):
+        """The noise file name(s), as run() returns them."""
+        return "|".join(os.path.basename(p) for p in info["noise_path"].split("|"))
